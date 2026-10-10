@@ -62,6 +62,7 @@
   function currentView() {
     const path = location.pathname.replace(/\/$/, '') || '/';
     if (path === '/proof') return 'proof';
+    if (path === '/sample') return 'sample';
     if (path === '/chamber') return 'case';
     if (path.endsWith('/reveal')) return 'reveal';
     if (path.startsWith('/chamber/')) return 'investigation';
@@ -72,7 +73,7 @@
     const view = currentView();
     $$('[data-view]').forEach(node => { node.hidden = node.dataset.view !== view; });
     $$('.site-nav [data-route]').forEach(link => {
-      const current = view === 'case' || view === 'investigation' || view === 'reveal' ? '/chamber' : (view === 'proof' ? '/proof' : '');
+      const current = view === 'case' || view === 'investigation' || view === 'reveal' ? '/chamber' : view === 'proof' ? '/proof' : view === 'sample' ? '/sample' : '';
       if (link.getAttribute('href') === current) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
     });
@@ -80,6 +81,7 @@
     if (view === 'investigation') renderInvestigationState();
     if (view === 'reveal' && loadReveal) renderRevealState();
     if (view === 'proof') renderProofState();
+    if (view === 'investigation') renderWorkflow();
     document.body.dataset.currentView = view;
     closeMenu();
     window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
@@ -217,11 +219,29 @@
     if (state.readiness?.sources) renderSources(state.readiness.sources);
   }
 
+  function renderWorkflow(activeRole) {
+    let current = 0;
+    if (state.atlasToken) current = 2;
+    else if (state.preToken) current = 1;
+    if (state.vexToken) current = 3;
+    if (state.sealToken) current = 4;
+    if (activeRole === 'ATLAS') current = 1;
+    if (activeRole === 'VEX') current = 2;
+    if (activeRole === 'SEAL') current = 3;
+    $('.workspace-steps > div').forEach((node, index) => {
+      node.classList.toggle('current', index === current);
+      node.classList.toggle('complete', index < current);
+      if (index === current) node.setAttribute('aria-current', 'step');
+      else node.removeAttribute('aria-current');
+    });
+  }
+
   function setRole(role, status, active = false) {
     if (active) selectRole(role);
     const seat = $(`[data-role="${role}"]`);
     if (!seat) return;
     seat.classList.toggle('is-active', active);
+    if (active && status === 'RUNNING') renderWorkflow(role.toUpperCase());
     seat.classList.toggle('is-complete', status === 'COMPLETE');
     text(`[data-role="${role}"] .agent-state`, status);
   }
@@ -354,6 +374,7 @@
     try {
       const result = await call();
       setRole(keys[role], 'COMPLETE', false);
+      renderWorkflow();
       return result;
     } catch (error) {
       setRole(keys[role], 'FAILED', false);
@@ -450,6 +471,7 @@
       text('#seal-time', `${formatTime(result.sealedAt)} · Server signed`);
       text('#reveal-state', 'Receipt is sealed. Verify it or reveal the post-event window.');
       $('#reveal-outcome').disabled = false;
+      renderWorkflow();
       saveSession();
       announce('The three roles completed and the pre-event record was sealed.');
     } catch {
@@ -458,6 +480,7 @@
   }
 
   function renderInvestigationState() {
+    renderWorkflow();
     if (state.preToken) {
       for (const role of ['atlas', 'vex', 'seal']) if (state[`${role}Token`]) setRole(role, 'COMPLETE');
       renderPreMarket(state.preToken.payload.prePack);
@@ -538,7 +561,7 @@
       $('#reveal-error').hidden = true;
       $('#reveal-data').hidden = true;
       $('#locked-message').hidden = false;
-      $('.reveal-heading h1').innerHTML = 'THE OUTCOME <br>IS WITHHELD.';
+      $('.reveal-heading h1').textContent = 'Market outcome locked';
       text('#reveal-summary', 'No signed record is available in this browser session.');
       return;
     }
@@ -546,16 +569,16 @@
     if (state.reveal) renderRevealData(state.reveal);
     else {
       $('#locked-message').hidden = false;
-      $('.reveal-heading h1').innerHTML = 'READY FOR <br>THE REVEAL.';
+      $('.reveal-heading h1').textContent = 'Ready to reveal';
       $('#locked-message h2').textContent = 'The record is sealed. Ready to reveal.';
       text('#reveal-summary', 'Post-event data is loaded only when you explicitly reveal it.');
       const link = $('#locked-message a');
-      link.textContent = 'Return to the sealed record →';
+      link.innerHTML = 'Return to the sealed record <span aria-hidden="true">↗</span>';
     }
   }
 
   function renderRevealData(result) {
-    $('.reveal-heading h1').innerHTML = 'THE MARKET <br>RESPONDED.';
+    $('.reveal-heading h1').textContent = 'Observed market movement';
     $('#reveal-loading').hidden = true;
     $('#reveal-error').hidden = true;
     $('#reveal-data').hidden = false;
