@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node scripts/build-check.js",
     "dev": "node scripts/dev-server.js",
-    "test:trust": "node tests/trust.test.js"
+    "test:trust": "node tests/trust.test.js",
+    "test:ui": "node scripts/ui-v3-check.js"
   },
   "engines": {
     "node": ">=22"
