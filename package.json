@@ -1,0 +1,14 @@
+{
+  "name": "veyrin-research-chamber",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VEYRIN — Research Chamber historical evidence replay",
+  "scripts": {
+    "build": "node scripts/build-check.js",
+    "dev": "node scripts/dev-server.js",
+    "test:trust": "node tests/trust.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

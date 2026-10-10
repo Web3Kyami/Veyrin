@@ -1,0 +1,43 @@
+# Environment files and credentials
+.env*
+!.env.example
+.vercel/
+.netlify/
+.npmrc
+.netrc
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Dependencies and generated output
+node_modules/
+dist/
+build/
+.next/
+.output/
+.vercel/output/
+coverage/
+.nyc_output/
+.cache/
+.turbo/
+.parcel-cache/
+
+# Local tooling and temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.temp
+*.bak
+
+# Editors
+.vscode/
+.idea/

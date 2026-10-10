@@ -1,0 +1,108 @@
+[
+  {
+    "viewport": "desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "errors": [],
+    "h1": {
+      "font": "\"Barlow Condensed\", \"Arial Narrow\", Impact, sans-serif",
+      "size": "68px",
+      "weight": "700",
+      "color": "rgb(247, 245, 240)"
+    },
+    "fontFaces": [
+      {
+        "family": "Barlow Condensed",
+        "status": "unloaded"
+      },
+      {
+        "family": "Barlow Condensed",
+        "status": "loaded"
+      },
+      {
+        "family": "Barlow Condensed",
+        "status": "unloaded"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "status": "loaded"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "status": "loaded"
+      },
+      {
+        "family": "IBM Plex Sans",
+        "status": "loaded"
+      },
+      {
+        "family": "IBM Plex Sans",
+        "status": "unloaded"
+      },
+      {
+        "family": "IBM Plex Sans",
+        "status": "loaded"
+      }
+    ],
+    "bg": "rgb(8, 9, 12)",
+    "bodyFont": "\"IBM Plex Sans\", \"Segoe UI\", sans-serif",
+    "heroLede": "17px",
+    "buttonRadius": "3px",
+    "buttonHeight": 0,
+    "stageRadius": "8px",
+    "imageLoaded": true
+  },
+  {
+    "viewport": "mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "errors": [],
+    "h1": {
+      "font": "\"Barlow Condensed\", \"Arial Narrow\", Impact, sans-serif",
+      "size": "52px",
+      "weight": "700",
+      "color": "rgb(247, 245, 240)"
+    },
+    "fontFaces": [
+      {
+        "family": "Barlow Condensed",
+        "status": "unloaded"
+      },
+      {
+        "family": "Barlow Condensed",
+        "status": "loaded"
+      },
+      {
+        "family": "Barlow Condensed",
+        "status": "unloaded"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "status": "loaded"
+      },
+      {
+        "family": "IBM Plex Mono",
+        "status": "loaded"
+      },
+      {
+        "family": "IBM Plex Sans",
+        "status": "loaded"
+      },
+      {
+        "family": "IBM Plex Sans",
+        "status": "unloaded"
+      },
+      {
+        "family": "IBM Plex Sans",
+        "status": "loaded"
+      }
+    ],
+    "bg": "rgb(8, 9, 12)",
+    "bodyFont": "\"IBM Plex Sans\", \"Segoe UI\", sans-serif",
+    "heroLede": "15px",
+    "buttonRadius": "3px",
+    "buttonHeight": 0,
+    "stageRadius": "8px",
+    "imageLoaded": true
+  }
+]

@@ -1,0 +1,13 @@
+*.md
+*.mdx
+.env*
+/docs/
+/design/
+/data/
+/tests/
+.agents/
+.codex/
+AGENTS.md
+PROMPT_TO_CODING_AGENT.md
+PACK_MANIFEST.json
+SKILL_INDEX_VERIFIED.json

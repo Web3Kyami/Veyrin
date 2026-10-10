@@ -1,0 +1,302 @@
+[
+  {
+    "check": "Landing no API attempt",
+    "passed": true
+  },
+  {
+    "check": "Hero keyboard CTA opens case",
+    "passed": true
+  },
+  {
+    "check": "Case keyboard navigation focuses heading",
+    "passed": true
+  },
+  {
+    "check": "Case enters chamber without API",
+    "passed": true
+  },
+  {
+    "check": "Mobile keyboard role selects VEX",
+    "passed": true
+  },
+  {
+    "check": "Run disabled before explicit availability check",
+    "passed": true
+  },
+  {
+    "check": "Seal remains hidden without receipt",
+    "passed": true
+  },
+  {
+    "check": "Keyboard opens mobile menu",
+    "passed": true
+  },
+  {
+    "check": "Escape closes menu and restores focus",
+    "passed": true
+  },
+  {
+    "check": "Mobile evidence collapsed initially",
+    "passed": true
+  },
+  {
+    "check": "Evidence disclosure opens",
+    "passed": true
+  },
+  {
+    "check": "/ at 1440px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/ at 1440px no API",
+    "passed": true
+  },
+  {
+    "check": "/ at 1440px no errors",
+    "passed": true
+  },
+  {
+    "check": "/ at 1024px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/ at 1024px no API",
+    "passed": true
+  },
+  {
+    "check": "/ at 1024px no errors",
+    "passed": true
+  },
+  {
+    "check": "/ at 390px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/ at 390px no API",
+    "passed": true
+  },
+  {
+    "check": "/ at 390px no errors",
+    "passed": true
+  },
+  {
+    "check": "/ at 375px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/ at 375px no API",
+    "passed": true
+  },
+  {
+    "check": "/ at 375px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 1440px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 1440px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 1440px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 1024px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 1024px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 1024px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 390px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 390px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 390px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 375px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 375px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber at 375px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 1440px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 1440px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 1440px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 1024px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 1024px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 1024px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 390px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 390px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 390px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 375px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 375px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27 at 375px no errors",
+    "passed": true
+  },
+  {
+    "check": "/proof at 1440px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/proof at 1440px no API",
+    "passed": true
+  },
+  {
+    "check": "/proof at 1440px no errors",
+    "passed": true
+  },
+  {
+    "check": "/proof at 1024px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/proof at 1024px no API",
+    "passed": true
+  },
+  {
+    "check": "/proof at 1024px no errors",
+    "passed": true
+  },
+  {
+    "check": "/proof at 390px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/proof at 390px no API",
+    "passed": true
+  },
+  {
+    "check": "/proof at 390px no errors",
+    "passed": true
+  },
+  {
+    "check": "/proof at 375px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/proof at 375px no API",
+    "passed": true
+  },
+  {
+    "check": "/proof at 375px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 1440px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 1440px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 1440px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 1024px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 1024px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 1024px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 390px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 390px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 390px no errors",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 375px no overflow",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 375px no API",
+    "passed": true
+  },
+  {
+    "check": "/chamber/nvda-2026-q2-fy27/reveal at 375px no errors",
+    "passed": true
+  },
+  {
+    "check": "Unsealed reveal locked",
+    "passed": true
+  },
+  {
+    "check": "Source disclosure keyboard opens four source links",
+    "passed": true
+  },
+  {
+    "check": "Catalogue makes no runtime verification claim",
+    "passed": true
+  },
+  {
+    "check": "Reduced motion has no stage animation",
+    "passed": true
+  }
+]
