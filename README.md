@@ -4,6 +4,21 @@ VEYRIN is a historical market-research replay. ATLAS builds a source-linked case
 
 Historical reconstruction cannot establish a contemporaneous forecast. Model training leakage remains possible. A signed digest protects the recorded bytes after sealing; it does not prove when the research was performed, establish causality, or represent an executable return. VEYRIN is not investment advice.
 
+## Interface / research scope
+
+The **v3 light-mode workstation** is being developed on branch `design/light-workstation-v3`. Its public routes are:
+
+| Route | Purpose | API use on ordinary page view |
+| --- | --- | --- |
+| `/` | Product overview, working interface preview | None |
+| `/chamber` | One supported historical case (NVIDIA) | None |
+| `/chamber/nvda-2026-q2-fy27` | Research workspace, dated source catalogue, explicit run controls | None until the user clicks an API action |
+| `/sample` | Documented aggregate summary of the previously completed real run | None; static report, **not** a newly verified receipt |
+| `/chamber/nvda-2026-q2-fy27/reveal` | Genuine post-event observation, gated by a sealed session token | Reveal requires an explicit user action |
+| `/proof` | Sources, signing rules, known limits, offline verification instructions | None unless checking availability or verifying a receipt |
+
+**This is not a general-purpose stock screener.** Both the frontend and server validators currently support one specific NVDA case. The archived sample shows actual documented aggregate figures but is neither a complete durable transcript nor a replay of a signed token. See [JUDGE.md](JUDGE.md) for a quick honest walkthrough and [UI V3 plan](docs/UI_V3_LIGHT_WORKSTATION_PLAN.md) for design/safety constraints.
+
 ## Requirements and setup
 
 - Node.js 22 or newer
@@ -75,7 +90,7 @@ vercel deploy . --prod -y
 
 Configure only the selected provider's variables in the Vercel project settings. Keep credentials in Vercel's server-side environment configuration. Do not put them in repository files.
 
-**Current status (October 2026):** the UI v2 and final visual cleanup are deployed to Preview at [veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app). Production has not been deployed. Review `STATE.md` and `docs/DESIGN_LEDGER.md` for current implementation and verification evidence.
+**Current status (October 2026):** Preview at [veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app) still serves the previously deployed dark v2. The light v3 is a **source-only GitHub branch** awaiting visual verification and Preview deployment. The previous successful end-to-end run is preserved in `STATE.md`. Production has not been deployed.
 
 ## Sources and rights
 
