@@ -1,83 +1,169 @@
-# VEYRIN — Research Chamber
+# VEYRIN
 
-**Research. Challenged.** A source-bound historical market-research workflow that makes a thesis pass through three distinct jobs before anyone can compare it with the selected market outcome.
+**Market research deserves a second opinion.**
 
-**[View the current V4 Preview](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/) · [Recorded study](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/sample) · [Evidence & method](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/proof)**
+VEYRIN puts three AI research roles on the same evidence. One builds the investment case, another looks for weak assumptions, and the third checks whether the conclusions hold up against the sources. The research is sealed before the historical market outcome becomes available.
 
-> **Status:** `design/agent-led-v4` is the current design-review branch. This Preview may not include subsequent commits until redeployed. The default `main` and Production have **not** been updated. This is an AI Trading Desk / Decision Stress Testing submission prototype, not a trading service, investment adviser or prospective forecasting benchmark.
+The first working investigation covers NVIDIA's fiscal Q2 2027 earnings announcement. You can open the evidence, inspect a documented completed run, or start a new investigation with your own question about that event.
 
-## Why VEYRIN exists
+**[Live Preview](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/) | [Open the research chamber](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber) | [See the completed study](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/sample) | [Read the verification method](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/proof)**
 
-A market thesis can sound convincing while relying on unsupported assumptions, date-ineligible material, or missing counterarguments. VEYRIN tests a research record against named sources before allowing a historical outcome comparison. Users see the case, the challenges and the audit—not simply a model's confident answer.
+> The linked Preview shows the latest deployment, which may lag behind the latest code on `design/agent-led-v4`. This branch has not been merged into `main` or deployed to Production.
 
-The current implementation intentionally supports **one historical case**, NVIDIA fiscal Q2 FY2027 earnings on **26 August 2026**. Users may supply an optional research question within that case, but they cannot choose arbitrary stocks or dates. New sessions use configured AI-provider credits; browsing the case and documented prior study does not.
+## The idea
 
-## Experience
+Research usually ends with one answer. We wanted to see what happens when the answer has to survive a challenge.
 
-| Page | What it actually does | Model / market calls when simply opening? |
+An analyst can build a convincing thesis from the available information and still miss an important risk. VEYRIN separates those jobs. ATLAS reads the case material and explains the thesis. VEX has to question specific claims and acknowledge the ones it cannot undermine. SEAL examines the evidence and records its assessment. The server checks the source references and output structure before accepting any stage.
+
+The historical outcome is handled separately. That makes it possible to read what the agents argued before looking at the selected Bitget observations.
+
+VEYRIN is built for the **Bitget AI Base Camp, AI Trading Desk / Decision Stress Testing** track.
+
+## Try it
+
+You can inspect the entire case without starting an AI run.
+
+| Where to go | What you can do |
+| --- | --- |
+| **[Chamber](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber)** | Open the supported NVIDIA event and browse the source catalogue |
+| **[Research](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber/nvda-2026-q2-fy27)** | Read dated sources, add an optional question, and choose whether to run the agents |
+| **[Recorded study](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/sample)** | See the findings and selected market observations from a previously completed investigation |
+| **[Evidence & method](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/proof)** | See the source cutoff, verification process, and what a receipt actually establishes |
+
+**If you're judging the project:** start with the recorded study. It contains the results of a real earlier end-to-end run and requires no model credits. Then open the Chamber, expand the dated sources, and look at the agent workflow. A fresh run is optional and will use the configured model provider.
+
+### Starting a fresh investigation
+
+1. Open the NVIDIA case and follow **Open case** into the research chamber.
+2. Optionally enter a question. The question guides the research, but it does not count as evidence.
+3. Select **Check availability**. This contacts the configured provider status and Bitget's pre-cutoff market-data endpoint.
+4. Select **Start research** to run ATLAS and VEX. The app displays real returned results and references.
+5. Select **Audit & seal**. SEAL completes the audit and the server returns the signed research record.
+6. Download or verify the receipt, then choose **Reveal outcome** to compare the selected market observations.
+
+Opening the site, reading the evidence catalogue, or viewing the recorded study does not start an AI inference request.
+
+## Meet the research team
+
+All three agents use the **same configured model**. Their instructions, inputs, and output contracts are different, and their work happens in sequence.
+
+| Agent | Its job | What it returns |
 | --- | --- | --- |
-| `/` | Explains the process and links to the working case | No |
-| `/chamber` | Displays the one supported NVIDIA event, cutoff and dated sources | No |
-| `/chamber/nvda-2026-q2-fy27` | Research workspace: optional question, availability check, ATLAS, VEX, SEAL, citations, receipt controls | No. Calls follow explicit buttons |
-| `/sample` | Documented **aggregate summary of a prior completed run**, with real Bitget observation values | No |
-| `/chamber/nvda-2026-q2-fy27/reveal` | Displays subsequent Bitget observations **after** a genuine sealed record verifies | No automatic reveal without a signed session |
-| `/proof` | Source and timing boundaries, role contracts, signature meaning and limits | No. Verification/readiness is opt-in |
+| **ATLAS** | Builds the strongest case the pre-cutoff evidence can reasonably support | A conditional thesis, 3 to 5 cited claims, caveats, unknowns, and points that could change the thesis |
+| **VEX** | Looks for gaps and challenges actual ATLAS claim IDs | Cited counterarguments, missing evidence, alternative explanations, and claims it concedes |
+| **SEAL** | Reads the record and checks the support behind each claim | Claim-by-claim assessments, a summary finding, remaining risks, and a forward checklist |
 
-### Research and outcome boundary
+### ATLAS: make the case
+
+ATLAS receives the signed pre-event packet and the optional research question. It cannot simply introduce a new source from its own knowledge. Every factual claim has to cite a source supplied in that packet.
+
+The goal is a useful conditional thesis. If the documents cannot support an assertion, ATLAS should identify the uncertainty rather than fill in the gap.
+
+### VEX: challenge the assumptions
+
+VEX receives the same evidence packet and ATLAS's validated claims. Its challenges must point back to specific claim IDs. A challenge should explain the concern and cite relevant material where available.
+
+It can also concede a sound claim. The purpose is to expose the weak parts of the reasoning, even when that means acknowledging that part of the original argument holds.
+
+### SEAL: finish the audit
+
+SEAL reviews the case and the challenges. It produces a disposition for each claim and a short assessment of the overall research.
+
+SEAL does not approve its own output. The application validates the role results and source references on the server before generating the final signed record.
+
+### How the handoff works
 
 ```mermaid
 flowchart TD
-    A[Four dated pre-event sources] --> B[Source cutoff checks]
-    C[Bitget pre-cutoff stock-token candle] --> B
-    B --> D[Signed pre-event packet]
-    D --> E[ATLAS: conditional thesis and cited claims]
-    E --> F[VEX: claim-specific counterarguments]
-    F --> G[SEAL: evidence audit]
-    G --> H[Server validation and sealed receipt]
-    H --> I{Record verifies?}
-    I -- No --> J[Reject reveal]
-    I -- Yes --> K[Load selected post-event Bitget candle]
-    K --> L[Compare observed prices and audited research]
+    A[Selected historical event] --> B[Date and source eligibility checks]
+    C[Bitget pre-cutoff candle] --> B
+    B --> D[Signed evidence packet]
+    D --> E[ATLAS: thesis and claims]
+    E --> F[Validate citations and output]
+    F --> G[VEX: challenge claim IDs]
+    G --> H[Validate challenges]
+    H --> I[SEAL: evidence audit]
+    I --> J[Validate and sign research receipt]
+    J --> K{Receipt verified?}
+    K -- No --> L[Reject the reveal]
+    K -- Yes --> M[Load selected Bitget post-event candle]
+    M --> N[Show observed change beside audited research]
 ```
 
-The model roles use a single explicitly configured provider/model with different instructions and output schemas; **they are not three independent AI providers**. The server checks allowed source IDs, citation formats, case identity, evidence timestamps and output shape, with additional deterministic validation. Only `api/reveal.js` imports the post-event outcome loader.
+The source cutoff applies to the evidence provided to the model. Because this is an event from the past, it cannot erase any knowledge the model may already have from training. We treat the output as historical research, not a live forecast.
 
-## The implemented case
+## The first investigation: NVIDIA Q2 FY2027
 
-| Attribute | Implemented value |
+The implementation currently supports one instrument and one event. The date, sources, symbol, and market windows are fixed in the server's case validation. Users can ask a different question about this event, but a new stock picker would require additional backend work.
+
+| Case setting | Value |
 | --- | --- |
-| Company / event | NVIDIA · Q2 FY2027 earnings |
-| Historical source cutoff | 26 Aug 2026, **19:45 UTC** |
-| Evidence | 4 dated documents; timestamp precision retained |
-| Sources | NVIDIA Investor Relations (Q1 release and earnings schedule); SEC Form 10-Q index; S&P Global Market Intelligence earnings preview |
-| Market instrument | Bitget Reality **RNVDAUSDT**, SPOT, USDT quote |
-| Pre-cutoff candle | 26 Aug 2026, **19:30–19:45 UTC**, completed 15m |
-| Post-event comparison candle | 26 Aug 2026, **20:30–20:45 UTC**, completed 15m |
+| Event | NVIDIA fiscal Q2 2027 earnings |
+| Evidence cutoff | 26 August 2026, 19:45 UTC |
+| Company sources | NVIDIA Q1 FY2027 results and Q2 earnings schedule |
+| Regulatory source | NVIDIA Q1 FY2027 Form 10-Q index, SEC EDGAR |
+| Research source | S&P Global Market Intelligence's Q2 earnings preview |
+| Market | Bitget Reality stock token `RNVDAUSDT`, spot, USDT quote |
+| Before | Completed 15-minute candle ending at 19:45 UTC |
+| After | Completed 15-minute candle ending at 20:45 UTC |
 
-Source eligibility and market identity are checked server-side at runtime. The page's initial source catalogue is **not** a claim that a new online eligibility check has just occurred. [Source provenance](data/cases/nvda-2026-q2-fy27/EVIDENCE.md).
+The four source documents retain their original timestamp precision. The SEC acceptance record, for example, displays a time without an explicit timezone. We preserve that uncertainty instead of assigning one.
 
-### Previously completed end-to-end investigation
+### What the completed investigation showed
 
-An earlier Google AI Studio / Gemini run completed the preflight → ATLAS → VEX → SEAL → verify → reveal journey. It is documented in [STATE.md](STATE.md) and shown in the static [recorded study](/sample) view of the deployed site.
+An earlier end-to-end run finished the agent sequence, server checks, receipt verification, and market reveal. The public recorded study presents its **saved summary**. It is not a new inference run and does not contain a replay of every original agent message.
 
-| Reported result | Recorded observation |
+| Stage | Recorded result |
 | --- | --- |
-| ATLAS | `MIXED` thesis, 3 evidence-cited claims |
-| VEX | 2 minor challenges; conceded claim C1 |
+| ATLAS | A mixed thesis with 3 evidence-cited claims |
+| VEX | 2 minor challenges; claim C1 was conceded |
 | SEAL | All 3 claims classified as supported |
-| Receipt | Verification returned `valid=true` |
-| Bitget pre-cutoff close | **209.63 USDT** |
-| Bitget subsequent close | **207.262 USDT** |
-| Selected-window price change | **−1.1296%** |
+| Receipt verification | Returned `valid: true` |
+| Bitget selected pre-cutoff close | 209.63 USDT |
+| Bitget selected post-event close | 207.262 USDT |
+| Observed price movement | **-1.1296%** |
 
-Digest reported by the previous run:
-`d03b17a5016a9308fd6e6c17957277bab952b229a38faefe08d570621dab9309`
+The original verification reported this SHA-256 record digest:
 
-**Proof boundary:** these are *documented aggregates*, not a new Qwen test or a restorable public transcript. The full prior signed token and agent messages are not provided as a durable shared-run link, so visiting `/sample` does not independently re-verify that older record. Two price observations are not a continuous chart, a trading return, proof of earnings causation or model prediction accuracy. Because the event is historical, model-training leakage remains possible.
+```text
+d03b17a5016a9308fd6e6c17957277bab952b229a38faefe08d570621dab9309
+```
 
-## Run locally
+The complete signed token and agent transcript from that older run are not exposed as a public, permanently stored session. The archived page therefore shows what was documented rather than pretending to perform a new verification.
 
-Requirements: **Node.js 22+** and npm. The project is plain browser HTML/CSS/JS with Node/Vercel serverless functions; no third-party package installation is required for the current implementation.
+The price change is measured between two selected completed Bitget candles. It is not a full price chart, a backtest, a realized trading return, or proof that the earnings release caused that movement.
+
+## Technology
+
+| Layer | Implementation |
+| --- | --- |
+| Website | Plain HTML, CSS, and JavaScript, including the agent interface and mobile layouts |
+| Server | Node.js serverless routes deployed through Vercel |
+| AI provider | OpenRouter, with a Qwen model selected through environment configuration for submission |
+| Market data | Bitget spot instrument discovery and completed 15-minute historical candles |
+| Research input | Fixed, dated source records with explicit cutoff eligibility rules |
+| Validation | JSON output schemas, source and citation checks, instrument allowlisting, stage-token checks |
+| Record integrity | Canonical JSON, SHA-256 digest, signed stage and final receipt tokens |
+| Session | Browser `sessionStorage` plus an exportable receipt |
+
+The backend includes support for an earlier provider configuration. A prior full integration run succeeded under that configuration. **Qwen through OpenRouter still needs its own successful compatibility and end-to-end check before we can report it as tested.** Provider selection is explicit, with no automatic silent fallback.
+
+### Why Bitget is involved
+
+The comparison uses Bitget's Reality stock token for NVIDIA. The server checks the symbol and requests the specified completed candle windows. It keeps post-event market data out of the research packet and only loads it after a valid signed record is provided.
+
+This project does not submit orders, hold funds, manage positions, or calculate a tradable strategy return.
+
+### How the receipt works
+
+Each stage receives a signed record from the previous step. The final record includes the pre-event packet hash, ATLAS, VEX, and SEAL results, the model configuration, and the server's deterministic checks. Verification checks the canonical digest and the signatures.
+
+A receipt can tell you whether the accepted record has been altered. It does not independently certify when the research happened. There is no database of publicly accessible run IDs. If you want to keep a record, download your receipt.
+
+## Run from source
+
+Node.js **22 or newer** is required.
 
 ```bash
 git clone https://github.com/Web3Kyami/Veyrin.git
@@ -86,18 +172,21 @@ cp .env.example .env.local
 npm run dev
 ```
 
-The GitHub repository is presently private; the clone command requires repository access until a public release. Open `http://127.0.0.1:3000`.
+The repository is private until release, so cloning requires access. The app runs locally at `http://127.0.0.1:3000`. Page browsing works without an API key. To start new research, set the server environment variables.
 
-Choose **one** server-side model provider in `.env.local` or your deployment's environment settings:
+### OpenRouter with Qwen
 
-| Provider | Environment variables | Notes |
-| --- | --- | --- |
-| Google AI Studio | `VEYRIN_AI_PROVIDER=google-ai-studio`, `GEMINI_API_KEY`, `GEMINI_MODEL` | Used for the earlier documented successful run |
-| OpenRouter | `VEYRIN_AI_PROVIDER=openrouter`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` | Can target a selected Qwen model ID; **Qwen compatibility and an end-to-end run are not yet verified** |
+Choose a Qwen model that supports the required JSON output and is available to your OpenRouter account. Set its exact model ID and key:
 
-There is **no silent cross-provider fallback**. No key is ever placed in frontend code. A model change during a signed run is rejected. A receipt signature depends on the selected signing credential; changing that key can invalidate older receipts. For a $1 OpenRouter test budget, set the restriction **on the dedicated OpenRouter API key**, not by claiming a cap that the application does not implement.
+```dotenv
+VEYRIN_AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=your_server_side_key
+OPENROUTER_MODEL=qwen/your_chosen_model
+```
 
-## Reproduce / inspect
+Keep credentials out of Git and the browser. For a limited testing budget, create a dedicated OpenRouter key and apply its spending cap through OpenRouter's key settings. The app's in-memory request limits are not a durable account-wide spending cap.
+
+### Offline checks
 
 ```bash
 node --check public/app.js
@@ -107,33 +196,31 @@ npm run test:ui
 npm run test:trust
 ```
 
-These are offline syntax, static-build and deterministic checks: **they do not call AI inference or live Bitget market APIs**. A genuine new investigation must be deliberately started in the UI with configured provider credentials; the previous Google run is not automatically replayed.
+These commands check syntax, required files, page structure, source eligibility, receipt tampering, and other deterministic rules. They do not need Google, Qwen, OpenRouter inference, or live Bitget requests.
 
-### Source layout
+A full investigation is a separate test because it requires external model and market services.
 
-| Directory / file | Responsibility |
+## Repository map
+
+| Path | What lives there |
 | --- | --- |
-| `public/index.html`, `styles.css`, `ui.js` | Interface, navigation, light-mode motion and reduced-motion handling |
-| `public/app.js`, `case-sources.js` | Client session, source rendering, stage controls and outcome display |
-| `api/` | Readiness, preflight, ATLAS, VEX, seal, verify, reveal handlers |
-| `lib/data/pre-case.js`, `load-pre.js` | Dated pre-event packet and Bitget pre-window |
-| `lib/data/post-outcome.js` | Post-event data; consumed only by reveal |
-| `lib/role-output-schemas.js`, `case-validation.js` | Role output contracts, citations, source/time/instrument checks |
-| `lib/security.js`, `receipt.js` | Canonical hashing, signed tokens, integrity validation |
-| `tests/`, `scripts/` | Offline checks, no paid model calls |
+| `public/` | Website routes, navigation, assets, interactive research interface |
+| `api/readiness.js` and `api/preflight.js` | Availability check and preparation of the pre-event packet |
+| `api/atlas.js`, `api/vex.js`, `api/seal.js` | The three sequential research stages |
+| `api/verify.js`, `api/reveal.js` | Receipt check and gated historical comparison |
+| `lib/role-output-schemas.js`, `lib/case-validation.js` | Strict output, evidence, and symbol checks |
+| `lib/data/pre-case.js`, `lib/data/load-pre.js` | Eligible sources, case timing, pre-event candle |
+| `lib/data/post-outcome.js` | Post-event compartment; only reveal should import it |
+| `lib/receipt.js`, `lib/security.js` | Canonical record generation, hashing, and signatures |
+| `data/cases/nvda-2026-q2-fy27/EVIDENCE.md` | Case sources, dates, and provenance |
+| `tests/`, `scripts/` | Reproducible offline checks |
 
-**[Judge walkthrough](JUDGE.md)** · **[API contracts](11_API_AND_SCHEMA_CONTRACTS.md)**
+## Current scope
 
-## What VEYRIN does *not* claim
+The current build supports the NVIDIA case, three sequential research roles, real source-linked responses, a downloadable signed receipt, and a gated historical comparison. It does not yet offer general stock selection, durable online investigation history, shared receipt links, order execution, or a public transcript of the archived run.
 
-- It is **not** a prospective blind prediction. Pre-event packet restrictions do not erase information potentially learned during model training.
-- It does not support arbitrary stock/date selection, live trading, orders, user funds or a persistent multi-user history.
-- A receipt proves integrity **since sealing with the configured server key**; it is not third-party timestamping or proof of historical foresight.
-- The observed Bitget token movement is not necessarily the movement of underlying NVIDIA stock and does not establish causality or an achievable trading return.
-- A documented sample is not a substitute for a fresh, independently verifiable run.
+This is a research prototype for a historical event. The user remains responsible for interpreting the evidence.
 
-## Deployment and license
+## License
 
-V4 Preview is available at the link above. **Do not merge into `main` or deploy Production without owner approval.** Server-only credentials must be configured in Vercel and must never be committed. Production should be checked for working direct routes and permissions before sharing with judges.
-
-© 2026 Kyami. Project code is MIT-licensed under [LICENSE](LICENSE). Bundled third-party font assets retain their applicable SIL Open Font License notices in `public/assets/fonts/`. Original fictional investigator artwork was generated for this project with owner authorization; see `public/assets/agents/manifest.json`.
+Copyright (c) 2026 Kyami. VEYRIN's application code is released under the [MIT License](LICENSE). Bundled fonts retain their required license notices in `public/assets/fonts/`.
