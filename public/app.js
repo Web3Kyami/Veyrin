@@ -840,7 +840,15 @@
       const link = event.target.closest('[data-route]');
       if (link) {
         event.preventDefault();
-        navigate(link.getAttribute('href'));
+        const destination = link.getAttribute('href');
+        const caseQuestion = $('#case-question');
+        const intendedQuestion = currentView() === 'case' && caseQuestion && destination.startsWith('/chamber/') && !destination.endsWith('/reveal')
+          ? caseQuestion.value.trim().slice(0, 1200) : null;
+        navigate(destination);
+        if (intendedQuestion !== null && $('#user-thesis')) {
+          $('#user-thesis').value = intendedQuestion;
+          if (intendedQuestion) $('.question-settings').open = true;
+        }
       }
     });
     window.addEventListener('popstate', () => renderRoute());
