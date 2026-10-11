@@ -1,99 +1,139 @@
-> **V4 Preview candidate:** the fresh Serein-based frontend on `design/agent-led-v4` is deployed for visual review at [veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app). Backend and provider configuration are unchanged. No Production deployment or branch merge has occurred.
-
 # VEYRIN — Research Chamber
 
-VEYRIN is a historical market-research replay. ATLAS builds a source-linked case, VEX challenges its claims, and SEAL audits the record. The app locks cutoff-limited evidence before it reveals a selected post-event Bitget market observation. People assess the reasoning; the system does not place trades.
+**Research. Challenged.** A source-bound historical market-research workflow that makes a thesis pass through three distinct jobs before anyone can compare it with the selected market outcome.
 
-Historical reconstruction cannot establish a contemporaneous forecast. Model training leakage remains possible. A signed digest protects the recorded bytes after sealing; it does not prove when the research was performed, establish causality, or represent an executable return. VEYRIN is not investment advice.
+**[View the current V4 Preview](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/) · [Recorded study](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/sample) · [Evidence & method](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/proof)**
 
-## Interface / research scope
+> **Status:** `design/agent-led-v4` is the current design-review branch. This Preview may not include subsequent commits until redeployed. The default `main` and Production have **not** been updated. This is an AI Trading Desk / Decision Stress Testing submission prototype, not a trading service, investment adviser or prospective forecasting benchmark.
 
-The **v3 light-mode workstation** is being developed on branch `design/light-workstation-v3`. Its public routes are:
+## Why VEYRIN exists
 
-| Route | Purpose | API use on ordinary page view |
+A market thesis can sound convincing while relying on unsupported assumptions, date-ineligible material, or missing counterarguments. VEYRIN tests a research record against named sources before allowing a historical outcome comparison. Users see the case, the challenges and the audit—not simply a model's confident answer.
+
+The current implementation intentionally supports **one historical case**, NVIDIA fiscal Q2 FY2027 earnings on **26 August 2026**. Users may supply an optional research question within that case, but they cannot choose arbitrary stocks or dates. New sessions use configured AI-provider credits; browsing the case and documented prior study does not.
+
+## Experience
+
+| Page | What it actually does | Model / market calls when simply opening? |
 | --- | --- | --- |
-| `/` | Product overview, working interface preview | None |
-| `/chamber` | One supported historical case (NVIDIA) | None |
-| `/chamber/nvda-2026-q2-fy27` | Research workspace, dated source catalogue, explicit run controls | None until the user clicks an API action |
-| `/sample` | Documented aggregate summary of the previously completed real run | None; static report, **not** a newly verified receipt |
-| `/chamber/nvda-2026-q2-fy27/reveal` | Genuine post-event observation, gated by a sealed session token | Reveal requires an explicit user action |
-| `/proof` | Sources, signing rules, known limits, offline verification instructions | None unless checking availability or verifying a receipt |
+| `/` | Explains the process and links to the working case | No |
+| `/chamber` | Displays the one supported NVIDIA event, cutoff and dated sources | No |
+| `/chamber/nvda-2026-q2-fy27` | Research workspace: optional question, availability check, ATLAS, VEX, SEAL, citations, receipt controls | No. Calls follow explicit buttons |
+| `/sample` | Documented **aggregate summary of a prior completed run**, with real Bitget observation values | No |
+| `/chamber/nvda-2026-q2-fy27/reveal` | Displays subsequent Bitget observations **after** a genuine sealed record verifies | No automatic reveal without a signed session |
+| `/proof` | Source and timing boundaries, role contracts, signature meaning and limits | No. Verification/readiness is opt-in |
 
-**This is not a general-purpose stock screener.** Both the frontend and server validators currently support one specific NVDA case. The archived sample shows actual documented aggregate figures but is neither a complete durable transcript nor a replay of a signed token. See [JUDGE.md](JUDGE.md) for a quick honest walkthrough and [UI V3 plan](docs/UI_V3_LIGHT_WORKSTATION_PLAN.md) for design/safety constraints.
+### Research and outcome boundary
 
-## Requirements and setup
+```mermaid
+flowchart TD
+    A[Four dated pre-event sources] --> B[Source cutoff checks]
+    C[Bitget pre-cutoff stock-token candle] --> B
+    B --> D[Signed pre-event packet]
+    D --> E[ATLAS: conditional thesis and cited claims]
+    E --> F[VEX: claim-specific counterarguments]
+    F --> G[SEAL: evidence audit]
+    G --> H[Server validation and sealed receipt]
+    H --> I{Record verifies?}
+    I -- No --> J[Reject reveal]
+    I -- Yes --> K[Load selected post-event Bitget candle]
+    K --> L[Compare observed prices and audited research]
+```
 
-- Node.js 22 or newer
-- npm
-- No third-party package install is needed for the current implementation
+The model roles use a single explicitly configured provider/model with different instructions and output schemas; **they are not three independent AI providers**. The server checks allowed source IDs, citation formats, case identity, evidence timestamps and output shape, with additional deterministic validation. Only `api/reveal.js` imports the post-event outcome loader.
 
-```sh
+## The implemented case
+
+| Attribute | Implemented value |
+| --- | --- |
+| Company / event | NVIDIA · Q2 FY2027 earnings |
+| Historical source cutoff | 26 Aug 2026, **19:45 UTC** |
+| Evidence | 4 dated documents; timestamp precision retained |
+| Sources | NVIDIA Investor Relations (Q1 release and earnings schedule); SEC Form 10-Q index; S&P Global Market Intelligence earnings preview |
+| Market instrument | Bitget Reality **RNVDAUSDT**, SPOT, USDT quote |
+| Pre-cutoff candle | 26 Aug 2026, **19:30–19:45 UTC**, completed 15m |
+| Post-event comparison candle | 26 Aug 2026, **20:30–20:45 UTC**, completed 15m |
+
+Source eligibility and market identity are checked server-side at runtime. The page's initial source catalogue is **not** a claim that a new online eligibility check has just occurred. [Source provenance](data/cases/nvda-2026-q2-fy27/EVIDENCE.md).
+
+### Previously completed end-to-end investigation
+
+An earlier Google AI Studio / Gemini run completed the preflight → ATLAS → VEX → SEAL → verify → reveal journey. It is documented in [STATE.md](STATE.md) and shown in the static [recorded study](/sample) view of the deployed site.
+
+| Reported result | Recorded observation |
+| --- | --- |
+| ATLAS | `MIXED` thesis, 3 evidence-cited claims |
+| VEX | 2 minor challenges; conceded claim C1 |
+| SEAL | All 3 claims classified as supported |
+| Receipt | Verification returned `valid=true` |
+| Bitget pre-cutoff close | **209.63 USDT** |
+| Bitget subsequent close | **207.262 USDT** |
+| Selected-window price change | **−1.1296%** |
+
+Digest reported by the previous run:
+`d03b17a5016a9308fd6e6c17957277bab952b229a38faefe08d570621dab9309`
+
+**Proof boundary:** these are *documented aggregates*, not a new Qwen test or a restorable public transcript. The full prior signed token and agent messages are not provided as a durable shared-run link, so visiting `/sample` does not independently re-verify that older record. Two price observations are not a continuous chart, a trading return, proof of earnings causation or model prediction accuracy. Because the event is historical, model-training leakage remains possible.
+
+## Run locally
+
+Requirements: **Node.js 22+** and npm. The project is plain browser HTML/CSS/JS with Node/Vercel serverless functions; no third-party package installation is required for the current implementation.
+
+```bash
+git clone https://github.com/Web3Kyami/Veyrin.git
+cd Veyrin
 cp .env.example .env.local
 npm run dev
 ```
 
-Open <http://127.0.0.1:3000>. Browsing the landing, case, chamber and Evidence routes does not call research or market APIs. Availability checks, investigations and reveal requests are explicit user actions. Do not add credentials to browser code or commit `.env.local`.
+The GitHub repository is presently private; the clone command requires repository access until a public release. Open `http://127.0.0.1:3000`.
 
-To enable a real investigation, supply the credentials for exactly the selected provider in `.env.local` or the server environment. Google AI Studio is the default:
+Choose **one** server-side model provider in `.env.local` or your deployment's environment settings:
 
-```dotenv
-VEYRIN_AI_PROVIDER=google-ai-studio
-GEMINI_API_KEY=your-server-side-key
-GEMINI_MODEL=your-enabled-model
-```
+| Provider | Environment variables | Notes |
+| --- | --- | --- |
+| Google AI Studio | `VEYRIN_AI_PROVIDER=google-ai-studio`, `GEMINI_API_KEY`, `GEMINI_MODEL` | Used for the earlier documented successful run |
+| OpenRouter | `VEYRIN_AI_PROVIDER=openrouter`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` | Can target a selected Qwen model ID; **Qwen compatibility and an end-to-end run are not yet verified** |
 
-OpenRouter is available only when selected explicitly:
+There is **no silent cross-provider fallback**. No key is ever placed in frontend code. A model change during a signed run is rejected. A receipt signature depends on the selected signing credential; changing that key can invalidate older receipts. For a $1 OpenRouter test budget, set the restriction **on the dedicated OpenRouter API key**, not by claiming a cap that the application does not implement.
 
-```dotenv
-VEYRIN_AI_PROVIDER=openrouter
-OPENROUTER_API_KEY=your-server-side-key
-OPENROUTER_MODEL=your-enabled-model
-```
+## Reproduce / inspect
 
-The two provider configurations are alternatives. A provider failure does not trigger a silent fallback. Bitget market observations are fetched by server routes when the user explicitly checks availability or opens a verified reveal; there is no market-data credential in the current configuration. `.env.example` lists every environment variable name without secret values.
-
-## Architecture
-
-- `public/` contains the responsive interface, local portrait and font assets, and client-side navigation.
-- `api/` contains Vercel Node.js serverless routes for readiness, preflight, ATLAS, VEX, SEAL, receipt verification, and post-event reveal.
-- `lib/data/pre-case.js` and `lib/data/load-pre.js` build the pre-event evidence packet. `lib/data/post-outcome.js` is imported only by `api/reveal.js`.
-- `lib/openrouter.js` handles the explicitly selected model provider. `lib/case-validation.js` checks sources, citations, and market observations. `lib/receipt.js` and `lib/security.js` canonicalize and sign the sealed record.
-- `design/pages/`, `DESIGN.md`, and the numbered product documents describe product, visual, data, architecture, and operational decisions. `AGENTS.md` and the skills references preserve the project-specific implementation workflow.
-- `tests/` contains trust-boundary, provider-configuration and evidence validation checks.
-
-The server keeps provider credentials out of browser code. It validates citations and role output deterministically, then seals a canonical receipt with SHA-256 and an HMAC-derived signature. The reveal route verifies the record before it loads post-event market data. The receipt is portable, but there is no database or durable shared-run URL. Changing the signing source can invalidate older signatures.
-
-## Case and evidence boundaries
-
-The current case is NVIDIA fiscal Q2 FY2027, August 26, 2026. Its evidence cutoff is 19:45 UTC. The pre-event packet includes four dated sources and a Bitget Reality SPOT 15-minute candle; the selected reveal window is 20:30–20:45 UTC. Timestamp precision is preserved as published. Current instrument identity and candle values are checked at runtime. See [case provenance](data/cases/nvda-2026-q2-fy27/EVIDENCE.md) and the [API and schema contracts](11_API_AND_SCHEMA_CONTRACTS.md).
-
-## Checks
-
-```sh
+```bash
+node --check public/app.js
+node --check public/ui.js
 npm run build
+npm run test:ui
 npm run test:trust
 ```
 
-The build check validates the local static assets, viewport, brand and pre/post route boundaries. The trust suite covers source cutoff eligibility, citation rejection, Bitget candle identity and windows, role shape, receipt tampering and the pre/post import boundary. These checks do not call live providers. A real investigation requires explicit UI actions and configured server credentials.
+These are offline syntax, static-build and deterministic checks: **they do not call AI inference or live Bitget market APIs**. A genuine new investigation must be deliberately started in the UI with configured provider credentials; the previous Google run is not automatically replayed.
 
-## Vercel deployment
+### Source layout
 
-The existing project is linked in `.vercel/project.json`. Authenticate the Vercel CLI, then create a Preview deployment:
+| Directory / file | Responsibility |
+| --- | --- |
+| `public/index.html`, `styles.css`, `ui.js` | Interface, navigation, light-mode motion and reduced-motion handling |
+| `public/app.js`, `case-sources.js` | Client session, source rendering, stage controls and outcome display |
+| `api/` | Readiness, preflight, ATLAS, VEX, seal, verify, reveal handlers |
+| `lib/data/pre-case.js`, `load-pre.js` | Dated pre-event packet and Bitget pre-window |
+| `lib/data/post-outcome.js` | Post-event data; consumed only by reveal |
+| `lib/role-output-schemas.js`, `case-validation.js` | Role output contracts, citations, source/time/instrument checks |
+| `lib/security.js`, `receipt.js` | Canonical hashing, signed tokens, integrity validation |
+| `tests/`, `scripts/` | Offline checks, no paid model calls |
 
-```sh
-vercel deploy . -y
-```
+**[Judge walkthrough](JUDGE.md)** · **[API contracts](11_API_AND_SCHEMA_CONTRACTS.md)**
 
-This command creates a Preview. Production deployment is separate and requires explicit owner approval:
+## What VEYRIN does *not* claim
 
-```sh
-vercel deploy . --prod -y
-```
+- It is **not** a prospective blind prediction. Pre-event packet restrictions do not erase information potentially learned during model training.
+- It does not support arbitrary stock/date selection, live trading, orders, user funds or a persistent multi-user history.
+- A receipt proves integrity **since sealing with the configured server key**; it is not third-party timestamping or proof of historical foresight.
+- The observed Bitget token movement is not necessarily the movement of underlying NVIDIA stock and does not establish causality or an achievable trading return.
+- A documented sample is not a substitute for a fresh, independently verifiable run.
 
-Configure only the selected provider's variables in the Vercel project settings. Keep credentials in Vercel's server-side environment configuration. Do not put them in repository files.
+## Deployment and license
 
-**Current status (11 October 2026):** `design/agent-led-v4` contains the reviewed frontend and is deployed to the V4 Preview linked above. It includes the workflow selector correction from the VPS review. The previous V3 branch and [V3 Preview](https://veyrin-research-chamber-hkauz251c-web3kyamis-projects.vercel.app) remain available for comparison. No main merge or Production deployment has occurred. The earlier end-to-end research run is preserved separately; V4 review did not rerun it.
+V4 Preview is available at the link above. **Do not merge into `main` or deploy Production without owner approval.** Server-only credentials must be configured in Vercel and must never be committed. Production should be checked for working direct routes and permissions before sharing with judges.
 
-## Sources and rights
-
-Market facts link to NVIDIA Investor Relations, SEC EDGAR, S&P Global Market Intelligence and Bitget. VEYRIN's three fictional investigator portraits were generated for this project with owner authorization. Portrait provenance is in `public/assets/agents/manifest.json`. Barlow Condensed, IBM Plex and Inter are bundled with their SIL Open Font Licenses. Layout and motion adapted from Serein retain its MIT notice in `public/assets/licenses/SEREIN-MIT.txt`. This project is MIT licensed; see [LICENSE](LICENSE).
+© 2026 Kyami. Project code is MIT-licensed under [LICENSE](LICENSE). Bundled third-party font assets retain their applicable SIL Open Font License notices in `public/assets/fonts/`. Original fictional investigator artwork was generated for this project with owner authorization; see `public/assets/agents/manifest.json`.
