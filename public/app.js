@@ -271,12 +271,14 @@
         const quote = document.createElement('p');
         quote.className = 'citation-quote';
         quote.textContent = excerpt;
+        const caveat = document.createElement('small');
+        caveat.textContent = 'Model-supplied citation text · check against the original document';
         const anchor = document.createElement('a');
         anchor.href = source.url || '#pre-market-panel';
         anchor.target = source.url ? '_blank' : '_self';
         if (source.url) anchor.rel = 'noopener noreferrer';
         anchor.textContent = 'Open original source ↗';
-        note.append(summary, quote, anchor);
+        note.append(summary, quote, caveat, anchor);
         links.append(note);
       } else {
         const link = document.createElement('a');
