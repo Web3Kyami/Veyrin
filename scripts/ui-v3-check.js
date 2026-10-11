@@ -70,4 +70,6 @@ for (const char of styles) {
 }
 assert.equal(depth, 0, 'Unclosed CSS brace');
 
+assert(html.includes('id="tesla-walkthrough"'), 'Missing historical research task walkthrough');
+assert(html.includes('THE TRADING DESK TAKEAWAY'), 'Missing human research takeaway');
 console.log('UI offline structure check passed: routes, elements, recorded-data disclosures and CSS blocks.');
