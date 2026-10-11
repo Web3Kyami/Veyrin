@@ -37,13 +37,16 @@ assert.match(js, /if \(\$\('#run-error'\)\.hidden\) showRunError\(error\.message
 assert.match(js, /if \(!state\.vexToken\) \{[\s\S]{0,250}api\('\/api\/vex'/, 'Retrying a saved VEX result must not spend a second inference');
 const investigationState = js.slice(js.indexOf('function renderInvestigationState'), js.indexOf('async function verifyReceipt'));
 assert.match(investigationState, /renderSources\(caseMetadata\(\)\?\.sources \|\| \[\]\)/, 'Case route must render that case’s sources before preflight');
-assert(html.includes('tsla-2026-q2') === false, 'Case identifiers and source configuration must not be duplicated in static HTML');
+assert(html.includes('/chamber/tsla-2026-q2'), 'Tesla record must link to its actual supported case');
 const caseCatalogue = fs.readFileSync('public/case-sources.js', 'utf8');
 for (const caseId of ['nvda-2026-q2-fy27', 'tsla-2026-q2']) assert(caseCatalogue.includes(caseId), 'Missing public source catalogue for ' + caseId);
 assert(vercel.rewrites.some((route) => route.source === '/sample' && route.destination === '/index.html'), 'Missing /sample Vercel direct-load rewrite');
-assert(html.includes('Previously') || html.includes('previously'), 'Archived data must be identified as previously documented');
+assert(html.includes('Recorded end-to-end investigation'), 'Archived study must be visibly identified as a completed prior run');
 assert(html.includes('not a newly verified') || html.includes('not a newly verified browser'), 'Sample must not claim runtime verification');
 assert(html.includes('209.63') && html.includes('207.262'), 'Sample must cite documented observations');
+assert(html.includes('374.55') && html.includes('364.70'), 'Tesla sample must display its real Bitget observations');
+assert(html.includes('4a218ae5705ba3821ee73e2aa5e58d2786b7e204a1f649c57bbcdc28c01ea27d'), 'Tesla sample must show its recorded digest');
+assert(html.includes('id="case-question"'), 'Case entry must provide an optional research question');
 assert(html.includes('−1.1296%'), 'Sample must use the documented change');
 assert(!html.includes('THREE MINDS.') && !html.includes('STAGE PREVIEW / 01'), 'Broadcast marketing remnants found');
 assert(css.includes('color-scheme:light') && css.includes('--canvas:#fff'), 'Light design tokens missing');
