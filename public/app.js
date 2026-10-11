@@ -262,12 +262,30 @@
     for (const citation of citations) {
       const source = sources.find(item => item.id === citation.sourceId);
       if (!source) continue;
-      const link = document.createElement('a');
-      link.href = source.url || '#pre-market-panel';
-      link.target = source.url ? '_blank' : '_self';
-      link.rel = source.url ? 'noopener noreferrer' : '';
-      link.textContent = `${citation.sourceId} · ${sourceLabel(citation.sourceId)}`;
-      links.append(link);
+      const excerpt = typeof citation.relevantQuote === 'string' ? citation.relevantQuote.trim() : '';
+      if (excerpt) {
+        const note = document.createElement('details');
+        note.className = 'citation-note';
+        const summary = document.createElement('summary');
+        summary.textContent = 'Source: ' + sourceLabel(citation.sourceId);
+        const quote = document.createElement('p');
+        quote.className = 'citation-quote';
+        quote.textContent = excerpt;
+        const anchor = document.createElement('a');
+        anchor.href = source.url || '#pre-market-panel';
+        anchor.target = source.url ? '_blank' : '_self';
+        if (source.url) anchor.rel = 'noopener noreferrer';
+        anchor.textContent = 'Open original source ↗';
+        note.append(summary, quote, anchor);
+        links.append(note);
+      } else {
+        const link = document.createElement('a');
+        link.href = source.url || '#pre-market-panel';
+        link.target = source.url ? '_blank' : '_self';
+        if (source.url) link.rel = 'noopener noreferrer';
+        link.textContent = 'Source: ' + sourceLabel(citation.sourceId);
+        links.append(link);
+      }
     }
     if (links.children.length) parent.append(links);
   }
@@ -276,24 +294,24 @@
     const section = document.createElement('details');
     section.open = true;
     const summary = document.createElement('summary');
-    summary.textContent = 'ATLAS / Research';
+    summary.textContent = 'ATLAS · Research thesis';
     section.append(summary);
     section.className = 'turn';
     section.dataset.transcriptRole = 'atlas';
     const heading = document.createElement('div');
     heading.className = 'turn-head';
-    heading.innerHTML = '<span>Citations checked</span>';
+    heading.innerHTML = '<span>Source-linked analysis</span>';
     const thesis = document.createElement('p');
     thesis.className = 'turn-thesis';
     thesis.textContent = output.thesis;
     addCitations(thesis, output.thesisCitations, sources);
     const stance = document.createElement('div');
     stance.className = 'turn-head';
-    stance.innerHTML = `<span>CONDITIONAL STANCE · ${escapeText(output.stance)}</span><span>CLAIMS · ${output.claims.length}</span>`;
+    stance.innerHTML = `<span>Assessment · ${escapeText(output.stance)}</span><span>${output.claims.length} sourced claims</span>`;
     section.append(heading, stance, thesis);
     appendStringList(section, 'Claims', output.claims.map(claim => ({ title: `${claim.id} · ${claim.strength} · ${claim.statement}`, caveat: claim.caveat, citations: claim.citations })), sources);
-    appendStringList(section, 'Unknowns', output.unknowns.map(value => ({ title: value })), sources);
-    appendStringList(section, 'Falsifiers and watch items', [...output.falsifiers, ...output.watchItems].map(value => ({ title: value })), sources);
+    appendStringList(section, 'What remains uncertain', output.unknowns.map(value => ({ title: value })), sources);
+    appendStringList(section, 'What could change the assessment', [...output.falsifiers, ...output.watchItems].map(value => ({ title: value })), sources);
     $('#transcript-content').append(section);
   }
 
@@ -324,17 +342,17 @@
     const section = document.createElement('details');
     section.open = true;
     const summary = document.createElement('summary');
-    summary.textContent = 'VEX / Challenges';
+    summary.textContent = 'VEX · Challenges and counterarguments';
     section.append(summary);
     section.className = 'turn';
     section.dataset.transcriptRole = 'vex';
     const heading = document.createElement('div');
     heading.className = 'turn-head';
-    heading.innerHTML = '<span>Challenges linked to claims</span>';
+    heading.innerHTML = '<span>Challenges tied to specific research claims</span>';
     section.append(heading);
     const challenges = output.challenges.map(challenge => ({ title: `${challenge.targetClaimId} · ${challenge.severity} · ${challenge.critique}`, citations: challenge.citations }));
-    appendStringList(section, challenges.length ? 'Challenges' : 'No sourced challenge survived validation', challenges, sources);
-    appendStringList(section, 'Conceded claims', output.concededClaimIds.map(id => ({ title: id })), sources);
+    appendStringList(section, challenges.length ? 'Challenges raised' : 'No additional supported challenge identified', challenges, sources);
+    appendStringList(section, 'Claims VEX accepted', output.concededClaimIds.map(id => ({ title: id })), sources);
     appendStringList(section, 'Missing evidence', output.missingEvidence, sources);
     appendStringList(section, 'Alternative hypotheses', output.alternateHypotheses, sources);
     $('#transcript-content').append(section);
@@ -344,21 +362,21 @@
     const section = document.createElement('details');
     section.open = true;
     const summary = document.createElement('summary');
-    summary.textContent = 'SEAL / Audit';
+    summary.textContent = 'SEAL · Final evidence audit';
     section.append(summary);
     section.className = 'turn';
     section.dataset.transcriptRole = 'seal';
     const heading = document.createElement('div');
     heading.className = 'turn-head';
-    heading.innerHTML = '<span>Evidence audit</span>';
+    heading.innerHTML = '<span>Claim-by-claim assessment</span>';
     const finding = document.createElement('p');
     finding.className = 'turn-thesis';
     finding.textContent = output.executiveFinding;
     const risk = document.createElement('p');
     risk.className = 'turn-thesis';
-    risk.textContent = `Missed risk: ${output.missedRisk}`;
+    risk.textContent = `Key remaining risk: ${output.missedRisk}`;
     section.append(heading, finding, risk);
-    appendStringList(section, 'Claim dispositions', output.dispositions.map(item => ({ title: `${item.claimId} · ${item.status}`, caveat: item.rationale, citations: item.citations })), sources);
+    appendStringList(section, 'Audit decisions', output.dispositions.map(item => ({ title: `${item.claimId} · ${item.status}`, caveat: item.rationale, citations: item.citations })), sources);
     appendStringList(section, 'What to watch next', output.forwardChecklist, sources);
     $('#transcript-content').append(section);
   }
