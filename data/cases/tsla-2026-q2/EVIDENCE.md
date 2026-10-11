@@ -1,13 +1,14 @@
 # Tesla Q2 2026 earnings historical reconstruction
 
-**Status:** source packet and Bitget instrument independently verified; live AI run and sealed outcome comparison pending. This is a retrospective reconstruction, not a contemporaneous forecast. A pretrained model may have learned the outcome.
+**Status (2026-10-11):** the five-source pre-event packet and Bitget instrument are verified. A Preview run completed preflight, ATLAS, VEX, SEAL, and one valid receipt check with signed stage tokens. The test did not retain the digest before the next UI assertion failed, and no market reveal was completed. Later verify and reveal requests received Vercel Security Checkpoint responses. This is a retrospective reconstruction, not a contemporaneous forecast. A pretrained model may have learned the outcome.
 
 ## Cutoff and windows
 
 - Event: Tesla Q2 2026 financial results, scheduled after market close July 22, 2026.
 - Evidence cutoff: `2026-07-22T19:45:00.000Z` (3:45 p.m. America/New_York). The company schedule said “after market close”; it did not promise an exact release time.
 - Pre-event market observation: completed 15-minute Bitget SPOT candle opened at `2026-07-22T19:30:00.000Z` and ended at the cutoff. It is included only if the runtime returns the exact interval and a qualifying instrument.
-- Outcome observation: the separate `2026-07-22T20:30:00.000Z` to `2026-07-22T20:45:00.000Z` candle is available only after the sealed record verifies.
+- Business Wire timestamped its results notice at 4:14 p.m. EDT (`2026-07-22T20:14:00Z`) in a [syndicated copy](https://www.streetinsider.com/Business%2BWire/Tesla%2BReleases%2BSecond%2BQuarter%2B2026%2BFinancial%2BResults/26801785.html?classic=1). This is 29 minutes after the evidence cutoff. Tesla IR displays the release date but not this clock time.
+- Outcome observation: the separate `2026-07-22T20:30:00.000Z` to `2026-07-22T20:45:00.000Z` candle opens 16 minutes after the newswire timestamp and is available only after the sealed record verifies.
 - The selected 15-minute candles are observations, not a continuous chart or a causal estimate.
 
 ## Bitget instrument identity
@@ -33,4 +34,4 @@ These sources precede the cutoff. Their current accessibility and displayed cont
 
 ## Outcome compartment
 
-Only after the record is sealed and verified, the reveal route loads the post window and links [Tesla's Q2 2026 financial results](https://ir.tesla.com/press-release/tesla-releases-second-quarter-2026-financial-results), published July 22 with date-only precision. Outcome candles, observed prices, volume, and change belong to the reveal record, never this case's model prompt.
+Only after the record is sealed and verified, the reveal route loads the post window and links [Tesla's Q2 2026 financial results](https://ir.tesla.com/press-release/tesla-releases-second-quarter-2026-financial-results), published July 22 with date-only precision. The more precise 4:14 p.m. EDT time is from the Business Wire syndication noted above. Outcome candles, observed prices, volume, and change belong to the reveal record, never this case's model prompt.
