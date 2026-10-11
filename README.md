@@ -1,8 +1,10 @@
-# VEYRIN — Research Chamber
+# VEYRIN
 
-VEYRIN is a historical market-research replay. ATLAS builds a source-linked case, VEX challenges its claims, and SEAL audits the record. The app locks cutoff-limited evidence before it reveals a selected post-event Bitget market observation. People assess the reasoning; the system does not place trades.
+**Market research deserves a second opinion.**
 
-Historical reconstruction cannot establish a contemporaneous forecast. Model training leakage remains possible. A signed digest protects the recorded bytes after sealing; it does not prove when the research was performed, establish causality, or represent an executable return. VEYRIN is not investment advice.
+VEYRIN runs a historical research case through three different AI roles. ATLAS builds the sourced thesis. VEX challenges the claims. SEAL audits the evidence. The server validates and seals the research before allowing the selected Bitget market comparison.
+
+The first supported event is NVIDIA fiscal Q2 2027 earnings. VEYRIN is currently a research prototype for that event. It cannot establish a contemporaneous forecast because the model may have learned the historical outcome during training.
 
 ## Requirements and setup
 
@@ -17,23 +19,15 @@ npm run dev
 
 Open <http://127.0.0.1:3000>. Browsing the landing, case, chamber and Evidence routes does not call research or market APIs. Availability checks, investigations and reveal requests are explicit user actions. Do not add credentials to browser code or commit `.env.local`.
 
-To enable a real investigation, supply the credentials for exactly the selected provider in `.env.local` or the server environment. The legacy configured provider can be selected explicitly:
-
-```dotenv
-VEYRIN_AI_PROVIDER=google-ai-studio
-GEMINI_API_KEY=your-server-side-key
-GEMINI_MODEL=your-enabled-model
-```
-
-For the intended Qwen configuration, choose OpenRouter explicitly:
+To start a new investigation, configure a server-side AI provider. For the intended Qwen submission, select OpenRouter and your chosen Qwen model ID:
 
 ```dotenv
 VEYRIN_AI_PROVIDER=openrouter
-OPENROUTER_API_KEY=your-server-side-key
-OPENROUTER_MODEL=your-enabled-model
+OPENROUTER_API_KEY=your_server_side_key
+OPENROUTER_MODEL=qwen/your_chosen_model
 ```
 
-These configurations are alternatives. A provider failure does not trigger a silent fallback. Bitget market observations are fetched by server routes when the user explicitly checks availability or opens a verified reveal; there is no market-data credential in the current configuration. `.env.example` lists every environment variable name without secret values.
+The backend also supports an earlier provider adapter, but it does not switch providers silently. The previous completed run is not a verified Qwen run. Bitget market observations come from server routes when a user explicitly checks availability or requests a verified reveal.
 
 ## Architecture
 
@@ -48,7 +42,7 @@ The server keeps provider credentials out of browser code. It validates citation
 
 ## Case and evidence boundaries
 
-The currently supported case is NVIDIA fiscal Q2 FY2027, August 26, 2026. Its evidence cutoff is 19:45 UTC. The pre-event packet includes four dated sources and a Bitget Reality SPOT 15-minute candle; the selected reveal window is 20:30–20:45 UTC. Timestamp precision is preserved as published. Current instrument identity and candle values are checked at runtime. See [case provenance](data/cases/nvda-2026-q2-fy27/EVIDENCE.md) .
+The currently supported case is NVIDIA fiscal Q2 FY2027, August 26, 2026. Its evidence cutoff is 19:45 UTC. The pre-event packet includes four dated sources and a Bitget Reality SPOT 15-minute candle; the selected reveal window is 20:30 to 20:45 UTC. Timestamp precision is preserved as published. Current instrument identity and candle values are checked at runtime. See [case provenance](data/cases/nvda-2026-q2-fy27/EVIDENCE.md).
 
 ## Checks
 
