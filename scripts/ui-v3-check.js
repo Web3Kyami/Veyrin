@@ -27,8 +27,11 @@ for (const id of [
 assert.match(js, /if \(path === '\/sample'\) return 'sample'/, 'Missing recorded-study route mapping');
 assert.match(js, /function renderCaseSelection\(\)/, 'Missing dynamic supported-case selector');
 assert.match(js, /open\.dataset\.route = casePath\(meta\.caseId\)/, 'Case cards must navigate to their own investigation');
-assert.match(js, /state\.atlasToken = await requestRole\('ATLAS'[\s\S]{0,220}saveSession\(\);[\s\S]{0,180}renderAtlas/, 'ATLAS receipt must be saved before transcript rendering');
-assert.match(js, /state\.vexToken = await requestRole\('VEX'[\s\S]{0,180}saveSession\(\);[\s\S]{0,180}renderVex/, 'VEX receipt must be saved before transcript rendering');
+assert.equal((js.match(/state\.atlasToken = atlasResult\.atlasToken/g) || []).length, 2, 'ATLAS response must be unwrapped into the signed token in both initial and retry paths');
+assert.equal((js.match(/state\.vexToken = vexResult\.vexToken/g) || []).length, 2, 'VEX response must be unwrapped into the signed token in both initial and retry paths');
+const roleRequest = js.slice(js.indexOf('async function requestRole'), js.indexOf('function showRunError'));
+assert.ok(roleRequest.indexOf('if (!result?.[tokenName]?.payload)') < roleRequest.indexOf("setRole(keys[role], 'COMPLETE'"), 'A role cannot become complete until its signed stage token is captured');
+assert.match(js, /if \(!preToken\?\.payload\?\.prePack \|\| !preToken\.payload\.preHash\)/, 'Preflight must capture its signed evidence packet before continuing');
 assert.match(js, /const retryRole = state\.preToken \?/, 'Unexpected stage errors must select the next recoverable stage');
 assert.match(js, /if \(\$\('#run-error'\)\.hidden\) showRunError\(error\.message/, 'Unexpected stage errors must be visible');
 assert.match(js, /if \(!state\.vexToken\) \{[\s\S]{0,250}api\('\/api\/vex'/, 'Retrying a saved VEX result must not spend a second inference');

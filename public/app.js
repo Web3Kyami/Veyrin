@@ -494,6 +494,8 @@
     announce(labels[role]);
     try {
       const result = await call();
+      const tokenName = { ATLAS: 'atlasToken', VEX: 'vexToken', SEAL: 'sealToken' }[role];
+      if (!result?.[tokenName]?.payload) throw new Error(`${role} returned no signed stage token.`);
       setRole(keys[role], 'COMPLETE', false);
       renderWorkflow();
       return result;
@@ -532,13 +534,16 @@
     $('#run-controls').hidden = true;
     try {
       const { preToken } = await api('/api/preflight', { caseId: state.caseId });
+      if (!preToken?.payload?.prePack || !preToken.payload.preHash) throw new Error('Preflight returned no signed evidence packet.');
       state.preToken = preToken;
       renderPreMarket(preToken.payload.prePack);
       saveSession();
-      state.atlasToken = await requestRole('ATLAS', () => api('/api/atlas', { preToken, userThesis: $('#user-thesis').value }));
+      const atlasResult = await requestRole('ATLAS', () => api('/api/atlas', { preToken, userThesis: $('#user-thesis').value }));
+      state.atlasToken = atlasResult.atlasToken;
       saveSession();
       renderAtlas(state.atlasToken.payload.output, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
-      state.vexToken = await requestRole('VEX', () => api('/api/vex', { preToken, atlasToken: state.atlasToken }));
+      const vexResult = await requestRole('VEX', () => api('/api/vex', { preToken, atlasToken: state.atlasToken }));
+      state.vexToken = vexResult.vexToken;
       saveSession();
       renderVex(state.vexToken.payload.output, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
       saveSession();
@@ -562,7 +567,8 @@
     if (!preToken) return startRun();
     try {
       if (role === 'ATLAS') {
-        state.atlasToken = await requestRole('ATLAS', () => api('/api/atlas', { preToken, userThesis: $('#user-thesis').value }));
+        const atlasResult = await requestRole('ATLAS', () => api('/api/atlas', { preToken, userThesis: $('#user-thesis').value }));
+        state.atlasToken = atlasResult.atlasToken;
         saveSession();
         $('#transcript-content').replaceChildren();
         renderAtlas(state.atlasToken.payload.output, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
@@ -571,7 +577,8 @@
       if (role === 'VEX') {
         if (!state.atlasToken) throw new Error('ATLAS must complete before VEX can retry.');
         if (!state.vexToken) {
-          state.vexToken = await requestRole('VEX', () => api('/api/vex', { preToken, atlasToken: state.atlasToken }));
+          const vexResult = await requestRole('VEX', () => api('/api/vex', { preToken, atlasToken: state.atlasToken }));
+          state.vexToken = vexResult.vexToken;
           saveSession();
         }
         const existingAtlas = state.atlasToken.payload.output;
