@@ -1,6 +1,6 @@
 # NVIDIA Q2 FY2027 historical reconstruction: provenance
 
-**Status: NOT READY.** This case is a historical reconstruction, not a contemporaneous forecast. The model may have learned the historical outcome despite receiving only a cutoff-limited evidence packet. No Bitget price values are stored in this pre-event document.
+**Status: implemented and previously verified in a Preview end-to-end run.** This remains a historical reconstruction, not a contemporaneous forecast. The model may have learned the historical outcome despite receiving only a cutoff-limited evidence packet. No Bitget price values are stored in this pre-event document.
 
 ## Locked time policy
 
@@ -21,11 +21,11 @@ These sources are from before the cutoff. Their own displayed precision is prese
 | `NVDA_PRE_CALENDAR` | [NVIDIA Q2 FY2027 results schedule](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Sets-Conference-Call-for-Second-Quarter-Financial-Results/default.aspx) | July 29, 2026 | Date only | Official schedule, approximately 1:20 p.m. PT release and 2 p.m. PT call. |
 | `NVDA_PRE_SP_GLOBAL` | [S&P Global Q2 earnings preview](https://www.spglobal.com/market-intelligence/en/news-insights/research/2026/08/nvidia-earnings-preview-q2-2027) | August 24, 2026 | Date only | Secondary analysis and Visible Alpha consensus; not company guidance. Preserve that it is a dated estimate, not ground truth. |
 
-The displayed source dates precede the cutoff by at least two days. Retrieval occurred after the event and therefore proves the current source contents, not contemporaneous access by a historical analyst. The source timestamps and excerpts will be validated in code before a case can be marked ready.
+The displayed source dates precede the cutoff by at least two days. Retrieval occurred after the event and therefore proves the current source contents, not contemporaneous access by a historical analyst. The application validates source eligibility and allowed citations in code. Runtime readiness also depends on the configured model and Bitget data endpoint.
 
 ## Outcome compartment
 
-The official NVIDIA Q2 release is linked only from the reveal compartment: [NVIDIA Q2 FY2027 results](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/). Bitget post-event candles will be fetched only after verifying a server-signed seal. The pre-event APIs and prompts must not import or receive this compartment.
+The official NVIDIA Q2 release is linked only from the reveal compartment: [NVIDIA Q2 FY2027 results](https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/). Bitget post-event candles are fetched by the reveal route only after verifying a server-signed seal. The pre-event APIs and prompts must not import or receive this compartment.
 
 ## Discovery limitation
 
