@@ -1,4 +1,4 @@
-const { loadPostOutcome, CASE_ID } = require('../lib/data/post-outcome');
+const { loadPostOutcome } = require('../lib/data/post-outcome');
 const { sha256, verifyToken } = require('../lib/security');
 const { verifyReceipt } = require('../lib/receipt');
 const { sendJson, method, readJson, softRateLimit, sendFailure } = require('../lib/http');
@@ -12,14 +12,14 @@ module.exports = async function reveal(req, res) {
       throw Object.assign(new Error('Reveal is locked until the sealed record and its signature verify.'), { code: 'REVEAL_SEAL_INVALID', statusCode: 403 });
     }
     const { record, digest } = sealToken.payload;
-    if (record.caseId !== CASE_ID || sha256(record) !== digest) throw Object.assign(new Error('The sealed record does not match this case.'), { code: 'REVEAL_CASE_MISMATCH', statusCode: 400 });
+    if (sha256(record) !== digest) throw Object.assign(new Error('The sealed record does not match its digest.'), { code: 'REVEAL_CASE_MISMATCH', statusCode: 400 });
     // The post-outcome module is reached only after signature and digest checks.
-    const outcome = await loadPostOutcome(record.preEvidence.bitgetPre.symbol);
+    const outcome = await loadPostOutcome(record.caseId, record.preEvidence.bitgetPre.symbol);
     const before = Number(record.preEvidence.bitgetPre.close);
     const after = Number(outcome.bitgetPost.close);
     const changePct = before > 0 && after > 0 && Number(outcome.bitgetPost.quoteTurnover) > 0 ? ((after - before) / before) * 100 : null;
     sendJson(res, 200, {
-      caseId: CASE_ID,
+      caseId: outcome.caseId,
       digest,
       pre: record.preEvidence.bitgetPre,
       post: outcome.bitgetPost,

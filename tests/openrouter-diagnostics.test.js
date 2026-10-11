@@ -23,6 +23,8 @@ test('ATLAS uses direct JSON Schema output and diagnostics keep prompts and cred
   global.fetch = async (_url, options) => {
     const payload = JSON.parse(options.body);
     assert.equal(payload.model, 'qwen/qwen3.8-27b:free');
+    assert.equal(payload.max_tokens, 2400, 'OpenRouter ATLAS needs room for the citation-heavy case response');
+    assert.match(payload.messages[0].content, /exactly three claims/);
     assert.equal(Object.hasOwn(payload, 'tools'), false);
     assert.equal(Object.hasOwn(payload, 'tool_choice'), false);
     assert.equal(Object.hasOwn(payload, 'parallel_tool_calls'), false);

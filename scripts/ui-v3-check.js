@@ -15,7 +15,7 @@ for (const view of ['landing', 'case', 'investigation', 'reveal', 'sample', 'pro
   assert.match(html, new RegExp('data-view="' + view + '"'), 'Missing page view: ' + view);
 }
 for (const id of [
-  'main', 'how-it-works', 'main-navigation', 'enter-investigation', 'case-source-list',
+  'main', 'how-it-works', 'main-navigation', 'case-list', 'evidence-cutoff',
   'evidence-ledger', 'stage-status', 'investigation-view', 'selected-role-duty',
   'user-thesis', 'check-availability', 'run-investigation', 'run-controls',
   'transcript-content', 'stage-actions', 'seal-record', 'seal-panel',
@@ -25,6 +25,18 @@ for (const id of [
   assert(ids.includes(id), 'Missing runtime-facing element #' + id);
 }
 assert.match(js, /if \(path === '\/sample'\) return 'sample'/, 'Missing recorded-study route mapping');
+assert.match(js, /function renderCaseSelection\(\)/, 'Missing dynamic supported-case selector');
+assert.match(js, /open\.dataset\.route = casePath\(meta\.caseId\)/, 'Case cards must navigate to their own investigation');
+assert.match(js, /state\.atlasToken = await requestRole\('ATLAS'[\s\S]{0,220}saveSession\(\);[\s\S]{0,180}renderAtlas/, 'ATLAS receipt must be saved before transcript rendering');
+assert.match(js, /state\.vexToken = await requestRole\('VEX'[\s\S]{0,180}saveSession\(\);[\s\S]{0,180}renderVex/, 'VEX receipt must be saved before transcript rendering');
+assert.match(js, /const retryRole = state\.preToken \?/, 'Unexpected stage errors must select the next recoverable stage');
+assert.match(js, /if \(\$\('#run-error'\)\.hidden\) showRunError\(error\.message/, 'Unexpected stage errors must be visible');
+assert.match(js, /if \(!state\.vexToken\) \{[\s\S]{0,250}api\('\/api\/vex'/, 'Retrying a saved VEX result must not spend a second inference');
+const investigationState = js.slice(js.indexOf('function renderInvestigationState'), js.indexOf('async function verifyReceipt'));
+assert.match(investigationState, /renderSources\(caseMetadata\(\)\?\.sources \|\| \[\]\)/, 'Case route must render that case’s sources before preflight');
+assert(html.includes('tsla-2026-q2') === false, 'Case identifiers and source configuration must not be duplicated in static HTML');
+const caseCatalogue = fs.readFileSync('public/case-sources.js', 'utf8');
+for (const caseId of ['nvda-2026-q2-fy27', 'tsla-2026-q2']) assert(caseCatalogue.includes(caseId), 'Missing public source catalogue for ' + caseId);
 assert(vercel.rewrites.some((route) => route.source === '/sample' && route.destination === '/index.html'), 'Missing /sample Vercel direct-load rewrite');
 assert(html.includes('Previously') || html.includes('previously'), 'Archived data must be identified as previously documented');
 assert(html.includes('not a newly verified') || html.includes('not a newly verified browser'), 'Sample must not claim runtime verification');

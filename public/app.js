@@ -1,15 +1,20 @@
 (() => {
-  const CASE_PATH = '/chamber/nvda-2026-q2-fy27';
-  const CASE_ID = 'nvda-2026-q2-fy27';
+  const DEFAULT_CASE_ID = 'nvda-2026-q2-fy27';
   const SESSION_KEY = 'veyrin-session-v1';
   const sourceLabel = id => ({
     NVDA_PRE_IR_Q1: 'NVIDIA Q1 results',
     NVDA_PRE_SEC_10Q: 'SEC Form 10-Q',
     NVDA_PRE_CALENDAR: 'NVIDIA event schedule',
     NVDA_PRE_SP_GLOBAL: 'S&P Global preview',
+    TSLA_PRE_Q1_UPDATE: 'Tesla Q1 update',
+    TSLA_PRE_SEC_10Q: 'SEC Form 10-Q',
+    TSLA_PRE_DELIVERY_CONSENSUS: 'Tesla delivery consensus',
+    TSLA_PRE_DELIVERIES: 'Tesla Q2 deliveries',
+    TSLA_PRE_EARNINGS_CONSENSUS: 'Tesla earnings consensus',
     BITGET_PRE_CANDLE: 'Bitget pre-cutoff candle'
   }[id] || id);
   const state = {
+    caseId: null,
     readiness: null,
     preToken: null,
     atlasToken: null,
@@ -24,6 +29,23 @@
   const $$ = selector => [...document.querySelectorAll(selector)];
   const text = (selector, value) => { const node = $(selector); if (node) node.textContent = value == null ? '' : String(value); };
   const announce = value => text('#global-announcer', value);
+
+  function caseIdFromPath(path = location.pathname) {
+    const match = path.replace(/\/$/, '').match(/^\/chamber\/([^/]+)(?:\/reveal)?$/);
+    return match && window.VEYRIN_CASES && window.VEYRIN_CASES[match[1]] ? match[1] : null;
+  }
+
+  function casePath(caseId = state.caseId || DEFAULT_CASE_ID) {
+    return `/chamber/${caseId}`;
+  }
+
+  function sessionKey(caseId) {
+    return `${SESSION_KEY}:${caseId}`;
+  }
+
+  function caseMetadata(caseId = state.caseId) {
+    return window.VEYRIN_CASES?.[caseId] || window.VEYRIN_CASES?.[DEFAULT_CASE_ID];
+  }
 
   async function api(path, body) {
     const response = await fetch(path, {
@@ -42,21 +64,37 @@
   function saveSession() {
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-        caseId: CASE_ID,
+        caseId: state.caseId,
         preToken: state.preToken,
         atlasToken: state.atlasToken,
         vexToken: state.vexToken,
         sealToken: state.sealToken,
         reveal: state.reveal
       }));
+      sessionStorage.setItem(sessionKey(state.caseId), sessionStorage.getItem(SESSION_KEY));
     } catch { /* The live page remains usable when browser storage is unavailable. */ }
   }
 
   function restoreSession() {
     try {
-      const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
-      if (saved && saved.caseId === CASE_ID) Object.assign(state, saved);
+      const scopedKey = sessionKey(state.caseId);
+      let saved = JSON.parse(sessionStorage.getItem(scopedKey) || 'null');
+      if (!saved && state.caseId === DEFAULT_CASE_ID) saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+      if (saved && saved.caseId === state.caseId) Object.assign(state, saved);
     } catch { sessionStorage.removeItem(SESSION_KEY); }
+  }
+
+  function resetCaseState(caseId) {
+    state.caseId = caseId;
+    state.readiness = null;
+    state.preToken = null;
+    state.atlasToken = null;
+    state.vexToken = null;
+    state.sealToken = null;
+    state.reveal = null;
+    state.lastFailedRole = null;
+    state.revealRequestActive = false;
+    restoreSession();
   }
 
   function currentView() {
@@ -64,12 +102,14 @@
     if (path === '/proof') return 'proof';
     if (path === '/sample') return 'sample';
     if (path === '/chamber') return 'case';
-    if (path.endsWith('/reveal')) return 'reveal';
-    if (path.startsWith('/chamber/')) return 'investigation';
+    if (caseIdFromPath(path) && path.endsWith('/reveal')) return 'reveal';
+    if (caseIdFromPath(path)) return 'investigation';
     return 'landing';
   }
 
   function renderRoute({ loadReveal = true } = {}) {
+    const routeCaseId = caseIdFromPath();
+    if (routeCaseId && routeCaseId !== state.caseId) resetCaseState(routeCaseId);
     const view = currentView();
     $$('[data-view]').forEach(node => { node.hidden = node.dataset.view !== view; });
     $$('.site-nav [data-route]').forEach(link => {
@@ -77,11 +117,12 @@
       if (link.getAttribute('href') === current) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
     });
-    if (view === 'case') renderCaseStatus();
+    if (view === 'case') renderCaseSelection();
     if (view === 'investigation') renderInvestigationState();
     if (view === 'reveal' && loadReveal) renderRevealState();
     if (view === 'proof') renderProofState();
     if (view === 'investigation') renderWorkflow();
+    if (view === 'investigation') renderInvestigationHeader();
     document.body.dataset.currentView = view;
     renderNavigation();
     closeMenu();
@@ -112,10 +153,9 @@
     setStatus($('#model-readiness'), 'Checking configuration…', 'wait');
     setStatus($('#bitget-readiness'), 'Checking instrument…', 'wait');
     try {
-      state.readiness = await api('/api/readiness');
+      state.readiness = await api(`/api/readiness?caseId=${encodeURIComponent(state.caseId || DEFAULT_CASE_ID)}`);
       renderReadiness();
-      renderCaseStatus();
-      text('#availability-note', state.readiness?.model?.configured && state.readiness?.bitget?.ready ? 'Ready. Begin the investigation when you choose.' : 'The investigation is not available yet. You can still inspect the sources.');
+      text('#availability-note', state.readiness?.model?.configured && state.readiness?.bitget?.ready ? `Ready · ${state.readiness.model.provider === 'openrouter' ? 'OpenRouter' : state.readiness.model.provider} · ${state.readiness.model.modelId}. Begin when you choose.` : 'The investigation is not available yet. You can still inspect the sources.');
     } catch (error) {
       state.readiness = { model: { configured: false }, bitget: { ready: false, error: error.message } };
       renderReadiness();
@@ -141,8 +181,6 @@
       : `${model.configured ? 'Model configured' : 'Model unavailable'} · ${bitget.ready ? 'Bitget verified' : 'Bitget not verified'}`);
     const runButton = $('#run-investigation');
     if (runButton && !state.atlasToken) runButton.disabled = !complete;
-    const enterButton = $('#enter-investigation');
-    if (enterButton) enterButton.disabled = false;
     const canRun = $('#investigation-view');
     if (canRun) canRun.dataset.ready = String(complete);
   }
@@ -151,12 +189,14 @@
     const list = $('#case-source-list');
     const ledger = $('#evidence-ledger');
     if (!Array.isArray(sources)) return;
-    list.replaceChildren();
-    const title = document.createElement('div');
-    title.className = 'source-list-title';
-    title.textContent = 'Publication dates and precision';
-    list.append(title);
-    ledger.replaceChildren();
+    if (list) {
+      list.replaceChildren();
+      const title = document.createElement('div');
+      title.className = 'source-list-title';
+      title.textContent = 'Publication dates and precision';
+      list.append(title);
+    }
+    if (ledger) ledger.replaceChildren();
     for (const source of sources) {
       const row = document.createElement('div');
       row.className = 'source-row';
@@ -173,7 +213,7 @@
       eligibility.className = 'source-state';
       eligibility.textContent = source.eligibility === 'CATALOGUED' ? 'Listed' : source.eligibility === 'VERIFIED_PRE' ? 'Pre-cutoff checked' : source.eligibility || 'Pre-cutoff checked';
       row.append(anchor, publisher, timing, eligibility);
-      list.append(row);
+      list?.append(row);
 
       const item = document.createElement('article');
       item.className = 'ledger-item';
@@ -201,31 +241,83 @@
       sourceMetadata.textContent = `${source.id} · ${source.publishedAt} · ${source.timestampPrecision}`;
       disclosure.append(summary, itemSummary, sourceMetadata);
       item.append(itemHead, itemLink, itemTime, disclosure);
-      ledger.append(item);
+      ledger?.append(item);
     }
-    text('#source-count', `${sources.filter(source => source.id !== 'BITGET_PRE_CANDLE').length} documents`);
+    const documentCount = sources.filter(source => source.id !== 'BITGET_PRE_CANDLE').length;
+    text('#source-count', `${documentCount} documents`);
+    text('#mobile-source-count', `${documentCount} sources`);
+    const cutoff = caseMetadata()?.cutoffAt;
+    text('#evidence-cutoff', cutoff ? `${cutoff.slice(0, 10)} · ${cutoff.slice(11, 16)} UTC` : 'Selected case');
   }
 
-  function renderCaseStatus() {
-    const modelReady = state.readiness?.model?.configured;
-    const bitget = state.readiness?.bitget;
-    const ready = Boolean(modelReady && bitget?.ready);
-    if (ready) {
-      setStatus($('#case-screen-status'), `READY · ${bitget.symbol}`, 'good');
-      text('#case-screen-detail', `Pre-candle verified · ${formatTime(bitget.timestamp)} · ${bitget.close} ${bitget.quoteCurrency}`);
-    } else if (!modelReady) {
-      setStatus($('#case-screen-status'), 'WAITING FOR PREVIEW MODEL CONFIG', 'wait');
-      text('#case-screen-detail', bitget?.ready ? `Bitget pre-window passed · ${bitget.symbol}.` : `Bitget pre-window · ${bitget?.error || 'not verified'}.`);
-    } else {
-      setStatus($('#case-screen-status'), `BITGET CHECK FAILED · ${bitget?.error || 'unavailable'}`, 'bad');
-      text('#case-screen-detail', 'No candle or instrument is assumed. Retry after the market data endpoint is reachable.');
+  function renderInvestigationHeader() {
+    const meta = caseMetadata();
+    if (!meta) return;
+    text('#investigation-subtitle', `${meta.company} · ${meta.eventTitle}`);
+    const cutoff = meta.cutoffAt;
+    text('#evidence-cutoff', `${cutoff.slice(0, 10)} · ${cutoff.slice(11, 16)} UTC`);
+  }
+
+  function renderCaseSelection() {
+    const list = $('#case-list');
+    if (!list || !window.VEYRIN_CASES) return;
+    list.replaceChildren();
+    for (const meta of Object.values(window.VEYRIN_CASES)) {
+      const article = document.createElement('article');
+      article.className = 'case-canvas';
+      const identity = document.createElement('div');
+      identity.className = 'case-identity';
+      const company = document.createElement('span');
+      company.className = 'eyebrow';
+      company.textContent = `${meta.company} · ${meta.ticker}`;
+      const event = document.createElement('h2');
+      event.textContent = meta.eventTitle;
+      const date = document.createElement('p');
+      date.textContent = meta.eventDate;
+      const chip = document.createElement('span');
+      chip.className = 'quiet-chip';
+      chip.textContent = 'Historical reconstruction';
+      identity.append(company, event, date, chip);
+
+      const context = document.createElement('div');
+      context.className = 'case-context';
+      const facts = document.createElement('dl');
+      for (const [label, value] of [
+        ['Evidence cutoff', `${meta.cutoffAt.slice(0, 10)} · ${meta.cutoffAt.slice(11, 16)} UTC`],
+        ['Source material', `${meta.sources.length} dated documents`],
+        ['Market comparison', meta.marketLabel]
+      ]) {
+        const row = document.createElement('div');
+        const term = document.createElement('dt'); term.textContent = label;
+        const description = document.createElement('dd'); description.textContent = value;
+        row.append(term, description); facts.append(row);
+      }
+      const disclosure = document.createElement('details');
+      disclosure.className = 'case-source-details';
+      const summary = document.createElement('summary');
+      summary.textContent = `Browse ${meta.sources.length} dated sources`;
+      disclosure.append(summary);
+      for (const source of meta.sources) {
+        const sourceItem = document.createElement('div');
+        sourceItem.className = 'case-source-item';
+        const sourceLink = document.createElement('a');
+        sourceLink.href = source.url; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; sourceLink.textContent = source.title;
+        const publisher = document.createElement('small'); publisher.textContent = `${source.publisher} · ${source.publishedAt} · ${source.timestampPrecision}`;
+        const summaryText = document.createElement('p'); summaryText.textContent = source.summary;
+        sourceItem.append(sourceLink, publisher, summaryText); disclosure.append(sourceItem);
+      }
+      const open = document.createElement('a');
+      open.className = 'button button-primary'; open.href = casePath(meta.caseId); open.dataset.route = casePath(meta.caseId);
+      open.textContent = 'Open case ↗';
+      const caseActions = document.createElement('div');
+      caseActions.className = 'case-enter';
+      const note = document.createElement('div'); note.className = 'case-readiness';
+      const noteTitle = document.createElement('strong'); noteTitle.textContent = 'Sources available to inspect';
+      const noteCopy = document.createElement('p'); noteCopy.textContent = 'Check the cutoff and Bitget window before starting the research passes.';
+      note.append(noteTitle, noteCopy); caseActions.append(note, open);
+      context.append(facts, disclosure, caseActions);
+      article.append(identity, context); list.append(article);
     }
-    $('#enter-investigation').disabled = false;
-    if (!state.readiness) {
-      text('#case-screen-status', 'Evidence window selected');
-      text('#case-screen-detail', 'Browse the dated sources before starting research.');
-    }
-    if (state.readiness?.sources) renderSources(state.readiness.sources);
   }
 
   function renderWorkflow(activeRole) {
@@ -420,12 +512,15 @@
     node.replaceChildren();
     const p = document.createElement('p');
     p.textContent = message;
-    const retry = document.createElement('button');
-    retry.className = 'button button-outline';
-    retry.type = 'button';
-    retry.textContent = `Retry ${role}`;
-    retry.addEventListener('click', () => retryRole(role));
-    node.append(p, retry);
+    node.append(p);
+    if (role) {
+      const retry = document.createElement('button');
+      retry.className = 'button button-outline';
+      retry.type = 'button';
+      retry.textContent = `Retry ${role}`;
+      retry.addEventListener('click', () => retryRole(role));
+      node.append(retry);
+    }
     node.hidden = false;
   }
 
@@ -436,24 +531,28 @@
     $('#transcript-content').replaceChildren();
     $('#run-controls').hidden = true;
     try {
-      const { preToken } = await api('/api/preflight', {});
+      const { preToken } = await api('/api/preflight', { caseId: state.caseId });
       state.preToken = preToken;
       renderPreMarket(preToken.payload.prePack);
       saveSession();
       state.atlasToken = await requestRole('ATLAS', () => api('/api/atlas', { preToken, userThesis: $('#user-thesis').value }));
-      renderAtlas(state.atlasToken.payload.output, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
       saveSession();
+      renderAtlas(state.atlasToken.payload.output, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
       state.vexToken = await requestRole('VEX', () => api('/api/vex', { preToken, atlasToken: state.atlasToken }));
+      saveSession();
       renderVex(state.vexToken.payload.output, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
       saveSession();
       text('#stage-status', 'ATLAS and VEX complete. Seal is available.');
       $('#stage-actions').hidden = false;
       text('#stage-action-copy', 'SEAL has not run yet. Continue only when you are ready to commit this transcript.');
       $('#seal-record').disabled = false;
-    } catch {
+    } catch (error) {
       $('#run-controls').hidden = false;
-      $('#run-investigation').disabled = false;
+      $('#run-investigation').disabled = Boolean(state.atlasToken);
       if (!state.atlasToken) $('#transcript-empty').hidden = false;
+      const retryRole = state.preToken ? (!state.atlasToken ? 'ATLAS' : !state.vexToken ? 'VEX' : null) : null;
+      text('#stage-status', retryRole ? `${retryRole} did not complete. Earlier signed stages remain saved.` : 'The investigation could not start.');
+      if ($('#run-error').hidden) showRunError(error.message || 'The interface could not continue this investigation.', retryRole);
     }
   }
 
@@ -464,13 +563,17 @@
     try {
       if (role === 'ATLAS') {
         state.atlasToken = await requestRole('ATLAS', () => api('/api/atlas', { preToken, userThesis: $('#user-thesis').value }));
+        saveSession();
         $('#transcript-content').replaceChildren();
         renderAtlas(state.atlasToken.payload.output, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
         state.vexToken = null;
       }
       if (role === 'VEX') {
         if (!state.atlasToken) throw new Error('ATLAS must complete before VEX can retry.');
-        state.vexToken = await requestRole('VEX', () => api('/api/vex', { preToken, atlasToken: state.atlasToken }));
+        if (!state.vexToken) {
+          state.vexToken = await requestRole('VEX', () => api('/api/vex', { preToken, atlasToken: state.atlasToken }));
+          saveSession();
+        }
         const existingAtlas = state.atlasToken.payload.output;
         $('#transcript-content').replaceChildren();
         renderAtlas(existingAtlas, [...preToken.payload.prePack.sources, preToken.payload.prePack.bitgetSource]);
@@ -483,7 +586,9 @@
         $('#seal-record').disabled = false;
         text('#stage-action-copy', 'ATLAS and VEX complete. SEAL is available.');
       }
-    } catch { /* Error notice is already rendered by requestRole. */ }
+    } catch (error) {
+      if ($('#run-error').hidden) showRunError(error.message || `The ${role} result could not be displayed.`, role);
+    }
   }
 
   async function sealRecord() {
@@ -529,6 +634,7 @@
         if (![...$('#transcript-content').children].some(node => node.dataset.transcriptRole === 'seal')) renderSealDraft(state.sealToken.payload.record.stages.seal.payload.output, [...state.preToken.payload.prePack.sources, state.preToken.payload.prePack.bitgetSource]);
       }
     } else {
+      renderSources(caseMetadata()?.sources || []);
       $('#run-controls').hidden = false;
       $('#run-investigation').disabled = !(state.readiness?.model?.configured && state.readiness?.bitget?.ready);
     }
@@ -556,7 +662,7 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `veyrin-${CASE_ID}-receipt.json`;
+    link.download = `veyrin-${state.caseId}-receipt.json`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -667,6 +773,10 @@
   function renderNavigation() {
     const view = currentView();
     const inApp = ['case', 'investigation', 'reveal'].includes(view);
+    const selectedPath = casePath(state.caseId || DEFAULT_CASE_ID);
+    $('[data-case-link="research"]').href = selectedPath;
+    $('[data-case-link="record"]').href = `${selectedPath}#seal-panel`;
+    $('[data-case-link="reveal"]').href = `${selectedPath}/reveal`;
     $('.site-header').classList.toggle('is-app', inApp);
     $('.app-nav').hidden = !inApp;
     $('.site-nav').hidden = inApp;
@@ -698,7 +808,7 @@
       const record = event.target.closest('[data-record]');
       if (record) {
         event.preventDefault();
-        navigate(CASE_PATH);
+        navigate(casePath());
         $('#seal-panel').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
         return;
       }
@@ -735,10 +845,9 @@
       $('.menu-toggle').setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
     });
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && $('.site-header').classList.contains('menu-open')) { closeMenu(); $('.menu-toggle').focus(); } });
-    $('#enter-investigation').addEventListener('click', () => navigate(CASE_PATH));
     $('#run-investigation').addEventListener('click', startRun);
     $('#seal-record').addEventListener('click', sealRecord);
-    $('#reveal-outcome').addEventListener('click', () => { navigate(`${CASE_PATH}/reveal`); if (!state.reveal) loadReveal(); });
+    $('#reveal-outcome').addEventListener('click', () => { navigate(`${casePath()}/reveal`); if (!state.reveal) loadReveal(); });
     $('#retry-reveal').addEventListener('click', loadReveal);
     $('#download-receipt').addEventListener('click', downloadReceipt);
     $('#proof-download').addEventListener('click', downloadReceipt);
@@ -754,10 +863,11 @@
   }
 
   function init() {
+    resetCaseState(caseIdFromPath() || DEFAULT_CASE_ID);
     restoreSession();
     bindEvents();
     renderRoute({ loadReveal: false });
-    if (!state.preToken) renderSources(window.VEYRIN_CASE_SOURCES || []);
+    if (!state.preToken) renderSources(caseMetadata()?.sources || []);
     const evidenceBreakpoint = matchMedia('(max-width: 600px)');
     $('.evidence-disclosure').open = !evidenceBreakpoint.matches;
     evidenceBreakpoint.addEventListener('change', event => { $('.evidence-disclosure').open = !event.matches; });

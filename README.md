@@ -4,7 +4,7 @@
 
 VEYRIN puts three AI research roles on the same evidence. One builds the investment case, another looks for weak assumptions, and the third checks whether the conclusions hold up against the sources. The research is sealed before the historical market outcome becomes available.
 
-The first working investigation covers NVIDIA's fiscal Q2 2027 earnings announcement. You can open the evidence, inspect a documented completed run, or start a new investigation with your own question about that event.
+VEYRIN supports two curated historical earnings investigations: NVIDIA fiscal Q2 FY2027 and Tesla Q2 2026. Tesla is the second case, with its own dated evidence packet, cutoff, Bitget Reality SPOT instrument, and market windows. Both are retrospective reconstructions, not contemporaneous forecasts.
 
 **[Live Preview](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/) | [Open the research chamber](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber) | [See the completed study](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/sample) | [Read the verification method](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/proof)**
 
@@ -26,8 +26,9 @@ You can inspect the entire case without starting an AI run.
 
 | Where to go | What you can do |
 | --- | --- |
-| **[Chamber](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber)** | Open the supported NVIDIA event and browse the source catalogue |
+| **[Chamber](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber)** | Choose the NVIDIA or Tesla event and browse its dated source catalogue |
 | **[Research](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber/nvda-2026-q2-fy27)** | Read dated sources, add an optional question, and choose whether to run the agents |
+| **[Tesla research](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/chamber/tsla-2026-q2)** | Inspect Tesla Q2 2026 sources, cutoff, and Bitget `RTSLAUSDT` market window |
 | **[Recorded study](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/sample)** | See the findings and selected market observations from a previously completed investigation |
 | **[Evidence & method](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app/proof)** | See the source cutoff, verification process, and what a receipt actually establishes |
 
@@ -35,7 +36,7 @@ You can inspect the entire case without starting an AI run.
 
 ### Starting a fresh investigation
 
-1. Open the NVIDIA case and follow **Open case** into the research chamber.
+1. Choose either supported case and follow **Open case** into its research chamber.
 2. Optionally enter a question. The question guides the research, but it does not count as evidence.
 3. Select **Check availability**. This contacts the configured provider status and Bitget's pre-cutoff market-data endpoint.
 4. Select **Start research** to run ATLAS and VEX. The app displays real returned results and references.
@@ -95,7 +96,7 @@ The source cutoff applies to the evidence provided to the model. Because this is
 
 ## The first investigation: NVIDIA Q2 FY2027
 
-The implementation currently supports one instrument and one event. The date, sources, symbol, and market windows are fixed in the server's case validation. Users can ask a different question about this event, but a new stock picker would require additional backend work.
+The implementation supports these two fixed cases. Each case has its own date, sources, verified Bitget symbol, and market windows; this is not a general stock picker.
 
 | Case setting | Value |
 | --- | --- |
@@ -109,6 +110,19 @@ The implementation currently supports one instrument and one event. The date, so
 | After | Completed 15-minute candle ending at 20:45 UTC |
 
 The four source documents retain their original timestamp precision. The SEC acceptance record, for example, displays a time without an explicit timezone. We preserve that uncertainty instead of assigning one.
+
+### Tesla Q2 2026
+
+| Case setting | Value |
+| --- | --- |
+| Event | Tesla second-quarter 2026 earnings |
+| Evidence cutoff | 22 July 2026, 19:45 UTC |
+| Pre-cutoff sources | Five Tesla Investor Relations and SEC records, published from 22 April through 17 July 2026 |
+| Market | Bitget Reality stock token `RTSLAUSDT`, spot, USDT quote |
+| Before | Completed 15-minute candle ending at 19:45 UTC |
+| After | Completed 15-minute candle ending at 20:45 UTC |
+
+Tesla's official schedule published before the event said results would follow after market close on 22 July, without an exact release time. The selected cutoff is the completed pre-event candle boundary, not a claim about the exact publication second. Source timing and the cutoff policy are documented in [Tesla provenance](data/cases/tsla-2026-q2/EVIDENCE.md). This remains a historical reconstruction; model training leakage is possible.
 
 ### What the completed investigation showed
 
@@ -151,7 +165,7 @@ The backend includes support for an earlier provider configuration. A prior full
 
 ### Why Bitget is involved
 
-The comparison uses Bitget's Reality stock token for NVIDIA. The server checks the symbol and requests the specified completed candle windows. It keeps post-event market data out of the research packet and only loads it after a valid signed record is provided.
+The comparison uses the selected case's Bitget Reality stock token: `RNVDAUSDT` for NVIDIA or `RTSLAUSDT` for Tesla. The server checks the symbol and requests that case's specified completed candle windows. It keeps post-event market data out of the research packet and only loads it after a valid signed record is provided.
 
 This project does not submit orders, hold funds, manage positions, or calculate a tradable strategy return.
 
@@ -209,15 +223,15 @@ A full investigation is a separate test because it requires external model and m
 | `api/atlas.js`, `api/vex.js`, `api/seal.js` | The three sequential research stages |
 | `api/verify.js`, `api/reveal.js` | Receipt check and gated historical comparison |
 | `lib/role-output-schemas.js`, `lib/case-validation.js` | Strict output, evidence, and symbol checks |
-| `lib/data/pre-case.js`, `lib/data/load-pre.js` | Eligible sources, case timing, pre-event candle |
+| `lib/data/pre-cases.js`, `lib/data/pre-case.js`, `lib/data/tesla-pre-case.js`, `lib/data/load-pre.js` | Eligible sources, case timing, pre-event candle |
 | `lib/data/post-outcome.js` | Post-event compartment; only reveal should import it |
 | `lib/receipt.js`, `lib/security.js` | Canonical record generation, hashing, and signatures |
-| `data/cases/nvda-2026-q2-fy27/EVIDENCE.md` | Case sources, dates, and provenance |
+| `data/cases/*/EVIDENCE.md` | Case sources, dates, and provenance |
 | `tests/`, `scripts/` | Reproducible offline checks |
 
 ## Current scope
 
-The current build supports the NVIDIA case, three sequential research roles, real source-linked responses, a downloadable signed receipt, and a gated historical comparison. It does not yet offer general stock selection, durable online investigation history, shared receipt links, order execution, or a public transcript of the archived run.
+The current build supports the NVIDIA and Tesla cases, three sequential research roles, real source-linked responses, a downloadable signed receipt, and a gated historical comparison. It does not yet offer general stock selection, durable online investigation history, shared receipt links, order execution, or a public transcript of the archived run.
 
 This is a research prototype for a historical event. The user remains responsible for interpreting the evidence.
 
