@@ -1,178 +1,196 @@
 # VEYRIN
 
-### Market research deserves a second opinion.
+**Market research I can question before I trust it.**
 
-VEYRIN is an AI research chamber for examining a market thesis before looking at the outcome. ATLAS builds the case from dated sources. VEX challenges what the evidence cannot support. SEAL reviews the claims and records the final assessment.
+[**Try VEYRIN**](https://veyrin-research-chamber.vercel.app/) | [**Open the Chamber**](https://veyrin-research-chamber.vercel.app/chamber) | [**Completed study**](https://veyrin-research-chamber.vercel.app/sample) | [**Evidence and method**](https://veyrin-research-chamber.vercel.app/proof)
 
-Instead of asking one model for an answer, we make the research pass through three jobs, validate the source references, and seal the record before comparing it with selected Bitget market observations.
+Built for **Bitget AI Base Camp**, under **AI Trading Desk: Decision Stress Testing**.
 
-Built for the **Bitget AI Base Camp Hackathon, AI Trading Desk / Decision Stress Testing** track.
+## Why I built VEYRIN
 
-[**Open VEYRIN**](https://veyrin-research-chamber-web3kyamis-projects.vercel.app/) · [**Explore the Chamber**](https://veyrin-research-chamber-web3kyamis-projects.vercel.app/chamber) · [**Inspect a completed study**](https://veyrin-research-chamber-web3kyamis-projects.vercel.app/sample) · [**Research method**](https://veyrin-research-chamber-web3kyamis-projects.vercel.app/proof)
+I kept coming back to one problem with using AI for earnings research. It can read a few documents, put together a convincing thesis and make the whole thing sound settled. But I still need to know which parts of that thesis are supported and which parts are assumptions.
 
-## Try it yourself
+Tesla's Q2 2026 delivery numbers are a good example from my testing. Tesla reported 480,126 deliveries, compared with a published estimate of 406,024. It is easy to read that as an obviously strong earnings setup. But deliveries alone don't answer questions about revenue, margins, profitability or what the market already expected.
 
-Open the Chamber and enter a question about an earnings event. Choose one of the two available historical evidence packs. You can inspect the sources without running the agents.
+That's the kind of question I wanted my research tool to catch before I take an AI answer seriously.
 
-| Research case | Evidence cutoff (UTC) | Pre-event sources | Bitget spot instrument |
+So I built **VEYRIN**, a research chamber where one agent has to make the case, another has to question it, and a third has to audit the claims. I can read the original sources, follow their reasoning and compare the signed research with selected Bitget market observations afterward.
+
+I built it for traders who follow earnings and tokenized US equities, especially discretionary, event-driven traders who still make their own decisions. I wanted something useful for the kind of trader who checks filings and estimates, wants a second opinion and would rather see *unresolved* than get a confident conclusion with missing evidence.
+
+I'm also approaching it as a developer. I wanted to see exactly which source informed each stage, preserve the agent handoffs and prevent the result from quietly changing when the historical outcome becomes visible.
+
+## Try your own research question
+
+Open the [Chamber](https://veyrin-research-chamber.vercel.app/chamber). You can enter a question, choose one of the supported earnings cases and inspect the dated sources before starting the agents.
+
+| Historical case | Cutoff (UTC) | Evidence packet | Bitget Reality stock token |
 | --- | --- | --- | --- |
-| **Tesla**, Q2 2026 earnings | 22 July 2026, 19:45 | Five dated Tesla IR and SEC records | `RTSLAUSDT` |
-| **NVIDIA**, fiscal Q2 2027 earnings | 26 August 2026, 19:45 | Four dated NVIDIA, SEC and S&P Global records | `RNVDAUSDT` |
+| **Tesla Q2 2026** | 22 July 2026, 19:45 | 5 Tesla IR and SEC sources | **RTSLAUSDT** |
+| **NVIDIA fiscal Q2 2027** | 26 August 2026, 19:45 | 4 NVIDIA, SEC and S&P Global sources | **RNVDAUSDT** |
 
-**The quickest judge path** is [the recorded study](https://veyrin-research-chamber-web3kyamis-projects.vercel.app/sample). It shows the results of an earlier completed Qwen investigation, including the three agent assessments, a recorded receipt digest and Bitget observations. You can then open the same case and inspect its sources or start a fresh run.
+The research question is optional. The evidence isn't. Each case has its own verified cutoff, source catalogue and market window, so I haven't added an arbitrary stock picker yet.
 
-A fresh run happens only when you choose to check availability and start research. The research question is optional and does not override the documented evidence pack. VEYRIN currently supports the two listed cases, not arbitrary ticker symbols or dates.
+**If you're reviewing the project**, I'd start with the [completed Tesla study](https://veyrin-research-chamber.vercel.app/sample). It shows what the agents actually returned and the Bitget comparison without spending model credits. From there you can inspect either case's sources, or run the full investigation yourself.
 
-## Meet the research team
+Opening the website, choosing a case and viewing the recorded study doesn't trigger model inference.
 
-Each role has a different responsibility. They run sequentially through one configured Qwen model, with deterministic server checks between stages.
+## Meet the three agents
 
-| Role | What it does | What you receive |
+I didn't want the same model to produce a thesis and then simply say the thesis looks good. VEYRIN gives it three different jobs, with server checks between them.
+
+| Agent | The job I give it | What it hands back |
 | --- | --- | --- |
-| **ATLAS** | Reads the dated evidence and makes a conditional case | A thesis, cited claims, caveats, unknowns and falsifiers |
-| **VEX** | Challenges specific ATLAS claims without needing to disagree with everything | Counterarguments tied to claim IDs, missing evidence, alternative explanations and concessions |
-| **SEAL** | Audits the claims after the challenges | Claim dispositions, a final finding, remaining risks and a checklist |
+| **ATLAS** | Make a conditional case using only the dated evidence | Thesis, cited claims, caveats, uncertainties and things that could change the assessment |
+| **VEX** | Try to break specific ATLAS claims, and concede the ones that hold up | Claim-linked challenges, missing support and concessions |
+| **SEAL** | Review the argument after VEX has challenged it | Claim dispositions, final assessment, unresolved risks and a checklist |
 
-### The agent handoff
+### The handoff
 
-```mermaid
+~~~mermaid
 flowchart LR
   A["Dated evidence"] --> B["ATLAS<br/>Build the case"]
-  B --> C["Server<br/>Check citations"]
+  B --> C["Check sources<br/>and structure"]
   C --> D["VEX<br/>Challenge claims"]
-  D --> E["Server<br/>Validate"]
-  E --> F["SEAL<br/>Audit evidence"]
+  D --> E["Validate<br/>the challenge"]
+  E --> F["SEAL<br/>Audit findings"]
   F --> G["Signed<br/>research record"]
-```
+~~~
 
-ATLAS should be able to say *we don't know*. VEX should be able to concede a solid point. SEAL should be able to leave a claim unresolved. A completed pipeline is not the same thing as three agents agreeing.
+ATLAS needs to tell me what the sources establish, rather than borrow certainty from a headline. VEX needs to challenge the actual claim IDs instead of making up reasons to disagree. SEAL needs to be able to call a claim contested or unresolved.
 
-The server verifies source IDs, time eligibility, output structure, claim references, instrument identity and signatures. These checks catch invalid or inconsistent records, but they cannot guarantee that every natural-language inference is correct. The researcher must still read the sources.
+The agents use separate prompts and output schemas through one configured model. The server checks the handoffs and references. SEAL isn't allowed to sign off on its own output without those checks.
 
-## From evidence to a market comparison
+The point of keeping the stages separate is practical: I can read the thesis, the criticism and the final audit without losing track of how the assessment changed.
 
-The event is treated as a historical reconstruction. The source packet is limited to material dated before a fixed cutoff. The agents receive that packet, not the results released afterward.
+## What happened when I tested Tesla
 
-```mermaid
+NVIDIA was my first complete historical case. I added Tesla to find out whether the system would still work with different sources, event dates and a different Bitget token.
+
+The Tesla Q2 2026 end-to-end test ran on **Qwen 3 30B A3B Instruct 2507 through OpenRouter**. Preflight, ATLAS, VEX, SEAL, receipt verification and the Bitget reveal all completed. The signed tokens were retained in the browser session.
+
+| Stage | Actual recorded result |
+| --- | --- |
+| **ATLAS** | A mixed thesis. Three source-linked claims, including 480,126 Q2 deliveries versus the published 406,024 estimate |
+| **VEX** | Challenged assumptions about the estimates and whether one token candle could establish broader market sentiment |
+| **SEAL** | **C1 contested, C2 unresolved, C3 contested**. It found insufficient support for a confident conclusion about financial performance |
+| **Receipt verification** | **valid: true** |
+| **Bitget RTSLAUSDT** | Selected 15-minute candle closes of **374.55** and **364.70 USDT**, an observed change of **-2.6298%** |
+
+The Tesla receipt reported this SHA-256 digest:
+
+~~~text
+4a218ae5705ba3821ee73e2aa5e58d2786b7e204a1f649c57bbcdc28c01ea27d
+~~~
+
+One thing I learned from this run is that a valid citation ID doesn't guarantee a sound interpretation. VEX generated alternative scenarios the supplied sources didn't establish, and VEX and SEAL incorrectly described Tesla's company-compiled sell-side analyst consensus. These were mistakes in the model's reasoning. I kept them documented because claim-level grounding is a real problem I still need to improve.
+
+What interested me about the audit was that it didn't automatically approve the initial thesis. Two claims were contested and one was unresolved. That is closer to the kind of scrutiny I wanted from the start, even though some of the explanations still need better factual checks.
+
+This is a historical observation of the Bitget token. The percentage is not a strategy return or proof the agents predicted the event.
+
+[Read the Tesla evidence and timing notes](data/cases/tsla-2026-q2/EVIDENCE.md).
+
+### The NVIDIA investigation
+
+The earlier NVIDIA fiscal Q2 2027 test also completed. ATLAS returned a mixed thesis with three cited claims, VEX raised two minor challenges, and SEAL marked all three claims supported. Receipt verification succeeded.
+
+The selected Bitget RNVDAUSDT closes were **209.63** and **207.262 USDT**, a **-1.1296%** observed movement. This earlier run used a different model configuration. I'm keeping the two test records distinct instead of presenting both as Qwen runs.
+
+[Read the NVIDIA evidence notes](data/cases/nvda-2026-q2-fy27/EVIDENCE.md).
+
+The [recorded study](https://veyrin-research-chamber.vercel.app/sample) summarizes the completed investigations. It isn't a live replay of missing messages or a fresh verification of a previously stored digest.
+
+## How I keep the research and outcome apart
+
+For each case, I set a source cutoff and a specific completed Bitget pre-event candle. The research stages receive only that pre-event packet. A later market candle is loaded through a separate route after the receipt verifies.
+
+~~~mermaid
 flowchart LR
   A["Pre-event sources<br/>+ Bitget candle"] --> B["Cutoff and<br/>instrument checks"]
-  B --> C["Three research<br/>passes"]
-  C --> D["Seal + SHA-256<br/>receipt"]
-  D --> E{"Signature valid?"}
+  B --> C["ATLAS + VEX<br/>+ SEAL"]
+  C --> D["Canonical record<br/>+ signed receipt"]
+  D --> E{"Receipt valid?"}
   E -- "No" --> F["Reject reveal"]
-  E -- "Yes" --> G["Post-event<br/>Bitget candle"]
-  G --> H["Observed change<br/>+ audit findings"]
-```
+  E -- "Yes" --> G["Load post-event<br/>Bitget candle"]
+  G --> H["Compare audited claims<br/>and observed prices"]
+~~~
 
-The pre-event and post-event observations are selected completed 15-minute candles of the same Bitget Reality stock token, quoted in USDT. They are not a continuous intraday chart. The result is a price observation, not executable profit, an attribution of earnings impact or proof that the model predicted anything.
+I use server-side checks for source eligibility, citation references, response shape, claim IDs, Bitget instrument identity and stage signatures. The final record has a SHA-256 digest and server signature. A user can download the receipt.
 
-A valid receipt shows the accepted record has not changed since sealing with the configured server key. It is not an independent timestamp of historical foresight. There is no online database of shared research sessions; download your own signed receipt to keep it.
+Verification means the accepted record has not been changed since sealing with the configured server key. It doesn't establish when the model originally formed its beliefs. These are retrospective cases, so I cannot exclude knowledge the model may have learned about the historical outcome.
 
-## Completed investigations
+The two Bitget candles are fixed observations rather than a full chart or an executable trade. I don't infer earnings causality from their percentage difference.
 
-The project has completed two historical research workflows. The Tesla run is the current Qwen-powered submission example.
+## What's under the hood
 
-### Tesla: Q2 2026 earnings
+I kept the implementation simple enough to inspect when something goes wrong.
 
-This end-to-end run used **Qwen 3 30B A3B Instruct 2507 via OpenRouter** with the selected Bitget Reality stock token `RTSLAUSDT`.
-
-| Stage | Recorded finding |
+| Part | Implementation |
 | --- | --- |
-| **ATLAS** | Mixed thesis. Compared 480,126 reported Q2 deliveries with the published 406,024 delivery estimate and raised questions about growth assumptions |
-| **VEX** | Questioned how representative the estimates were and whether a single token candle could establish broader market sentiment |
-| **SEAL** | Marked C1 **contested**, C2 **unresolved**, and C3 **contested**; found the source packet insufficient for a confident financial assessment |
-| **Verification** | Receipt verification returned `valid: true` |
-| **Market observation** | 374.55 to 364.70 USDT between the selected completed candles, **-2.6298%** |
+| Website | HTML, CSS and JavaScript, including desktop and mobile research views |
+| Server | Node.js serverless functions on Vercel |
+| AI | Qwen through OpenRouter, configured on the server |
+| Market data | Bitget Reality SPOT instruments and completed historical candles |
+| Research inputs | Curated dated evidence packets for each supported case |
+| Validation | Role output schemas, case and source checks, signed stage handoffs |
+| Receipt | Canonical JSON, SHA-256 digest and server-side signature |
+| Session | Browser session storage and downloadable receipt |
 
-The verified run reported this digest:
+The code is divided by responsibility rather than putting the whole research flow into one request.
 
-```text
-4a218ae5705ba3821ee73e2aa5e58d2786b7e204a1f649c57bbcdc28c01ea27d
-```
-
-The model was not flawless. It incorrectly described Tesla's company-compiled sell-side analyst consensus and offered a few unsupported alternative explanations. Those responses remain part of the documented research record; the underlying evidence does not establish those assertions. SEAL's refusal to give the case a confident endorsement is itself useful, though not every individual audit judgment was correct.
-
-[Read the Tesla source record](data/cases/tsla-2026-q2/EVIDENCE.md).
-
-### NVIDIA: fiscal Q2 2027 earnings
-
-The earlier completed investigation used the NVIDIA earnings packet and `RNVDAUSDT`. ATLAS returned a mixed thesis with three cited claims. VEX raised two minor challenges. SEAL classified the three claims as supported. A signed receipt was verified.
-
-The selected Bitget observations moved from **209.63 to 207.262 USDT**, or **-1.1296%**. This was an earlier provider run, not a Qwen verification.
-
-[Read the NVIDIA source record](data/cases/nvda-2026-q2-fy27/EVIDENCE.md).
-
-The [recorded study page](https://veyrin-research-chamber-web3kyamis-projects.vercel.app/sample) summarizes both. These are preserved findings from actual investigations, not fabricated demo transcripts. A previous digest shown in the UI cannot be independently reverified without the original signed token.
-
-## How it's built
-
-| Layer | Implementation |
+| Where to look | What it does |
 | --- | --- |
-| Interface | HTML, CSS and JavaScript, with mobile and reduced-motion support |
-| Research backend | Node.js serverless functions on Vercel |
-| AI | Qwen through OpenRouter, configured server-side |
-| Market data | Bitget Reality stock tokens and completed SPOT historical candles |
-| Evidence | Dated NVIDIA/Tesla documents; per-case pre-cutoff packet |
-| Validation | JSON Schema plus deterministic source, timestamp, instrument and claim-reference checks |
-| Integrity | Canonical JSON, SHA-256 record digest, signed stage tokens and a verifiable final receipt |
-| User sessions | Browser session storage and downloadable receipt; no shared-run database |
+| **public/** | Chamber, case selector, source links, research display and results |
+| **api/preflight.js** | Prepares the signed evidence packet |
+| **api/atlas.js**, **api/vex.js**, **api/seal.js** | Runs each research stage |
+| **api/verify.js**, **api/reveal.js** | Checks the receipt and handles the gated comparison |
+| **lib/data/** | Case definitions, evidence and separate pre/post-event loaders |
+| **lib/case-validation.js** | Checks sources, outputs, claims and instruments |
+| **lib/receipt.js**, **lib/security.js** | Builds and verifies signed records |
+| **tests/**, **scripts/** | Runs deterministic offline checks |
 
-The model calls are separate from source verification. No secret is sent to the browser, and there is no silent provider fallback. Trading execution and wallet custody are outside this application.
+### Run it locally
 
-### Main code paths
+You'll need Node.js 22 or newer and access to the repository.
 
-| Path | Responsibility |
-| --- | --- |
-| `public/` | Website, cases, research transcript and results |
-| `api/preflight.js` | Accepts a selected case and builds a signed pre-event packet |
-| `api/atlas.js`, `api/vex.js`, `api/seal.js` | The three research passes |
-| `api/verify.js`, `api/reveal.js` | Receipt check and post-event data gate |
-| `lib/data/` | Case definitions and pre/post-event market loaders |
-| `lib/case-validation.js` | Evidence, time, symbol and role-output checks |
-| `lib/receipt.js`, `lib/security.js` | Canonical hashing and signatures |
-| `tests/`, `scripts/` | Offline reproducibility and trust-boundary checks |
-
-## Run locally
-
-Node.js 22 or newer is required. The application has no additional npm dependency installation step.
-
-```bash
+~~~bash
 git clone https://github.com/Web3Kyami/Veyrin.git
 cd Veyrin
 cp .env.example .env.local
 npm run dev
-```
+~~~
 
-Open `http://localhost:3000`. The repository must be publicly accessible or you must have GitHub access to clone it.
+Open **http://localhost:3000**. For a fresh Qwen investigation, set the following in the server environment:
 
-To enable Qwen research, set these values in the server environment:
-
-```dotenv
+~~~dotenv
 VEYRIN_AI_PROVIDER=openrouter
-OPENROUTER_API_KEY=your_server_key
+OPENROUTER_API_KEY=your_server_side_key
 OPENROUTER_MODEL=qwen/qwen3-30b-a3b-instruct-2507:nitro
-```
+~~~
 
-Do not commit a real key. API credits are used when starting research. Provider spending caps should be enforced in the OpenRouter account, not inferred from the UI.
+Keep the key out of the browser and Git. Paid model calls happen when a user explicitly starts research. I leave spending limits to the provider's account settings.
 
-### Reproduce the offline checks
+### Offline checks
 
-```bash
+~~~bash
 node --check public/app.js
 node --check public/ui.js
 npm run build
 npm run test:ui
 npm run test:trust
-```
+~~~
 
-These checks do not make paid model calls. A real end-to-end test must be started separately with an authorized API key and a working Bitget connection.
+These checks don't make paid inference calls. The final Tesla run also passed the reported **14/14 trust tests** and desktop/mobile browser checks.
 
-## Scope and limitations
+## What I want to improve
 
-VEYRIN currently supports two curated historical events. It has no general ticker search, autonomous trading, portfolio management or public multi-user research history. The agent output can contain mistakes even when a receipt is technically valid. The system makes those decisions inspectable rather than treating a model response as unquestionable.
+I have two working historical cases and a completed Qwen investigation, but this is still an early research tool. The backend doesn't support arbitrary stock selection, live trading, portfolios or permanent shared histories.
 
-The research cutoff limits the packet supplied to the model; it cannot remove knowledge of past events learned during training. The Bitget price observations do not establish causality, model foresight or an obtainable investment return.
+My next priority is stronger claim-level evidence checking, followed by broader case coverage. I also want to put the workflow in front of more discretionary traders and measure whether they can complete a research task, inspect the sources and explain what remains uncertain. I don't have user adoption, retention or trading-performance figures to claim yet.
+
+For now, the human stays responsible for the decision. That's the kind of research assistant I wanted to build.
 
 ## License
 
-Copyright (c) 2026 Kyami. The application code is distributed under the [MIT License](LICENSE). Bundled fonts retain their required notices.
+Copyright (c) 2026 Kyami. VEYRIN is released under the [MIT License](LICENSE). Bundled fonts retain their required notices.
