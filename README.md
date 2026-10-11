@@ -92,7 +92,7 @@ vercel deploy . --prod -y
 
 Configure only the selected provider's variables in the Vercel project settings. Keep credentials in Vercel's server-side environment configuration. Do not put them in repository files.
 
-**Current status (11 October 2026):** the light workstation branch is deployed to Preview at [veyrin-research-chamber-hkauz251c-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-hkauz251c-web3kyamis-projects.vercel.app). This VPS deployment includes one local frontend initialization fix (the workflow stage selector); that correction has not been pushed back to GitHub. Production has not been deployed. The previous successful end-to-end run is preserved in `STATE.md`.
+**Current status (11 October 2026):** `design/agent-led-v4` contains the reviewed frontend and is deployed to the V4 Preview linked above. It includes the workflow selector correction from the VPS review. The previous V3 branch and [V3 Preview](https://veyrin-research-chamber-hkauz251c-web3kyamis-projects.vercel.app) remain available for comparison. No main merge or Production deployment has occurred. The earlier end-to-end research run is preserved separately; V4 review did not rerun it.
 
 ## Sources and rights
 
