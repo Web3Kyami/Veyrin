@@ -6,6 +6,7 @@ const { CASE_ID, CUTOFF_AT, PRE_WINDOW, PRE_SOURCES, getPreSources, isSourcePreE
 const { assertPrePack, getSourceIds, assertAtlas, assertVex, assertSealDraft, assertVerifiedMarketInstruments } = require('../lib/case-validation');
 const { verifyReceipt } = require('../lib/receipt');
 const { selectNvdaRealityInstrument, selectRealityInstrument } = require('../lib/bitget');
+const { roleOutputSchemas } = require('../lib/role-output-schemas');
 const tesla = require('../lib/data/tesla-pre-case');
 const { DEFAULT_CASE_ID, getPreSources: getCaseSources, isSupportedCase, listPreCases } = require('../lib/data/pre-cases');
 
@@ -131,6 +132,27 @@ test('ATLAS, VEX and SEAL outputs are role-shaped and citation-bound', () => {
   assert.equal(assertVex(vexOutput, ids, claimIds), undefined);
   const sealOutput = { dispositions: ['C1', 'C2', 'C3'].map(claimId => ({ claimId, status: 'UNRESOLVED', rationale: 'The historical price response is outside this evidence packet.', citations: [{ sourceId: 'NVDA_PRE_CALENDAR' }] })), executiveFinding: 'No directional result follows from the eligible evidence.', missedRisk: 'Historical model leakage remains possible.', forwardChecklist: ['Compare only after sealing.'] };
   assert.equal(assertSealDraft(sealOutput, ids, claimIds), undefined);
+});
+
+test('VEX and SEAL schema bounds leave room for complete audit reasoning', () => {
+  assert.equal(roleOutputSchemas.VEX.properties.challenges.items.properties.critique.maxLength, 800);
+  assert.equal(roleOutputSchemas.SEAL.properties.dispositions.items.properties.rationale.maxLength, 800);
+  const ids = getSourceIds(pack());
+  const atlasClaimIds = new Set(['C1', 'C2', 'C3']);
+  const longReason = 'A complete source-grounded sentence. '.repeat(18).trim();
+  assert.equal(longReason.length, 665);
+  const vexOutput = {
+    challenges: [{ targetClaimId: 'C1', critique: longReason, citations: [{ sourceId: 'NVDA_PRE_SP_GLOBAL' }], severity: 'MATERIAL' }],
+    concededClaimIds: [], missingEvidence: [], alternateHypotheses: []
+  };
+  assert.equal(assertVex(vexOutput, ids, atlasClaimIds), undefined);
+  const sealOutput = {
+    dispositions: ['C1', 'C2', 'C3'].map(claimId => ({ claimId, status: 'CONTESTED', rationale: longReason, citations: [{ sourceId: 'NVDA_PRE_CALENDAR' }] })),
+    executiveFinding: 'The available evidence does not establish a directional result.',
+    missedRisk: 'Historical model leakage remains possible.',
+    forwardChecklist: []
+  };
+  assert.equal(assertSealDraft(sealOutput, ids, atlasClaimIds), undefined);
 });
 
 test('role signatures and a canonical seal reject changed bytes', () => {
