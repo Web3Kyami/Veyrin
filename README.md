@@ -17,7 +17,7 @@ npm run dev
 
 Open <http://127.0.0.1:3000>. Browsing the landing, case, chamber and Evidence routes does not call research or market APIs. Availability checks, investigations and reveal requests are explicit user actions. Do not add credentials to browser code or commit `.env.local`.
 
-To enable a real investigation, supply the credentials for exactly the selected provider in `.env.local` or the server environment. Google AI Studio is the default:
+To enable a real investigation, supply the credentials for exactly the selected provider in `.env.local` or the server environment. The legacy configured provider can be selected explicitly:
 
 ```dotenv
 VEYRIN_AI_PROVIDER=google-ai-studio
@@ -25,7 +25,7 @@ GEMINI_API_KEY=your-server-side-key
 GEMINI_MODEL=your-enabled-model
 ```
 
-OpenRouter is available only when selected explicitly:
+For the intended Qwen configuration, choose OpenRouter explicitly:
 
 ```dotenv
 VEYRIN_AI_PROVIDER=openrouter
@@ -33,7 +33,7 @@ OPENROUTER_API_KEY=your-server-side-key
 OPENROUTER_MODEL=your-enabled-model
 ```
 
-The two provider configurations are alternatives. A provider failure does not trigger a silent fallback. Bitget market observations are fetched by server routes when the user explicitly checks availability or opens a verified reveal; there is no market-data credential in the current configuration. `.env.example` lists every environment variable name without secret values.
+These configurations are alternatives. A provider failure does not trigger a silent fallback. Bitget market observations are fetched by server routes when the user explicitly checks availability or opens a verified reveal; there is no market-data credential in the current configuration. `.env.example` lists every environment variable name without secret values.
 
 ## Architecture
 
@@ -41,14 +41,14 @@ The two provider configurations are alternatives. A provider failure does not tr
 - `api/` contains Vercel Node.js serverless routes for readiness, preflight, ATLAS, VEX, SEAL, receipt verification, and post-event reveal.
 - `lib/data/pre-case.js` and `lib/data/load-pre.js` build the pre-event evidence packet. `lib/data/post-outcome.js` is imported only by `api/reveal.js`.
 - `lib/openrouter.js` handles the explicitly selected model provider. `lib/case-validation.js` checks sources, citations, and market observations. `lib/receipt.js` and `lib/security.js` canonicalize and sign the sealed record.
-- `design/pages/`, `DESIGN.md`, and the numbered product documents describe product, visual, data, architecture, and operational decisions. `AGENTS.md` and the skills references preserve the project-specific implementation workflow.
+- The current design revision and release README are being prepared on the `design/agent-led-v4` branch.
 - `tests/` contains trust-boundary, provider-configuration and evidence validation checks.
 
 The server keeps provider credentials out of browser code. It validates citations and role output deterministically, then seals a canonical receipt with SHA-256 and an HMAC-derived signature. The reveal route verifies the record before it loads post-event market data. The receipt is portable, but there is no database or durable shared-run URL. Changing the signing source can invalidate older signatures.
 
 ## Case and evidence boundaries
 
-The current case is NVIDIA fiscal Q2 FY2027, August 26, 2026. Its evidence cutoff is 19:45 UTC. The pre-event packet includes four dated sources and a Bitget Reality SPOT 15-minute candle; the selected reveal window is 20:30–20:45 UTC. Timestamp precision is preserved as published. Current instrument identity and candle values are checked at runtime. See [case provenance](data/cases/nvda-2026-q2-fy27/EVIDENCE.md) and the [API and schema contracts](11_API_AND_SCHEMA_CONTRACTS.md).
+The currently supported case is NVIDIA fiscal Q2 FY2027, August 26, 2026. Its evidence cutoff is 19:45 UTC. The pre-event packet includes four dated sources and a Bitget Reality SPOT 15-minute candle; the selected reveal window is 20:30–20:45 UTC. Timestamp precision is preserved as published. Current instrument identity and candle values are checked at runtime. See [case provenance](data/cases/nvda-2026-q2-fy27/EVIDENCE.md) .
 
 ## Checks
 
@@ -75,7 +75,7 @@ vercel deploy . --prod -y
 
 Configure only the selected provider's variables in the Vercel project settings. Keep credentials in Vercel's server-side environment configuration. Do not put them in repository files.
 
-**Current status (October 2026):** the UI v2 and final visual cleanup are deployed to Preview at [veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app). Production has not been deployed. Review `STATE.md` and `docs/DESIGN_LEDGER.md` for current implementation and verification evidence.
+**Current status (October 2026):** the UI v2 and final visual cleanup are deployed to Preview at [veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app). Production has not been deployed. The `design/agent-led-v4` branch contains the newer release candidate and detailed documentation.
 
 ## Sources and rights
 
