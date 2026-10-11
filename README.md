@@ -1,3 +1,5 @@
+> **V4 Preview candidate:** the fresh Serein-based frontend on `design/agent-led-v4` is deployed for visual review at [veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-bjkfenv8g-web3kyamis-projects.vercel.app). Backend and provider configuration are unchanged. No Production deployment or branch merge has occurred.
+
 # VEYRIN — Research Chamber
 
 VEYRIN is a historical market-research replay. ATLAS builds a source-linked case, VEX challenges its claims, and SEAL audits the record. The app locks cutoff-limited evidence before it reveals a selected post-event Bitget market observation. People assess the reasoning; the system does not place trades.
@@ -90,8 +92,8 @@ vercel deploy . --prod -y
 
 Configure only the selected provider's variables in the Vercel project settings. Keep credentials in Vercel's server-side environment configuration. Do not put them in repository files.
 
-**Current status (October 2026):** Preview at [veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-ql8gm4430-web3kyamis-projects.vercel.app) still serves the previously deployed dark v2. The light v3 is a **source-only GitHub branch** awaiting visual verification and Preview deployment. The previous successful end-to-end run is preserved in `STATE.md`. Production has not been deployed.
+**Current status (11 October 2026):** the light workstation branch is deployed to Preview at [veyrin-research-chamber-hkauz251c-web3kyamis-projects.vercel.app](https://veyrin-research-chamber-hkauz251c-web3kyamis-projects.vercel.app). This VPS deployment includes one local frontend initialization fix (the workflow stage selector); that correction has not been pushed back to GitHub. Production has not been deployed. The previous successful end-to-end run is preserved in `STATE.md`.
 
 ## Sources and rights
 
-Market facts link to NVIDIA Investor Relations, SEC EDGAR, S&P Global Market Intelligence and Bitget. VEYRIN's three fictional investigator portraits were generated for this project with owner authorization. Portrait provenance is in `public/assets/agents/manifest.json`. Barlow Condensed and IBM Plex are bundled with their SIL Open Font Licenses. This project is MIT licensed; see [LICENSE](LICENSE).
+Market facts link to NVIDIA Investor Relations, SEC EDGAR, S&P Global Market Intelligence and Bitget. VEYRIN's three fictional investigator portraits were generated for this project with owner authorization. Portrait provenance is in `public/assets/agents/manifest.json`. Barlow Condensed, IBM Plex and Inter are bundled with their SIL Open Font Licenses. Layout and motion adapted from Serein retain its MIT notice in `public/assets/licenses/SEREIN-MIT.txt`. This project is MIT licensed; see [LICENSE](LICENSE).

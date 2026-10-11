@@ -83,6 +83,7 @@
     if (view === 'proof') renderProofState();
     if (view === 'investigation') renderWorkflow();
     document.body.dataset.currentView = view;
+    renderNavigation();
     closeMenu();
     window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }
@@ -153,7 +154,7 @@
     list.replaceChildren();
     const title = document.createElement('div');
     title.className = 'source-list-title';
-    title.innerHTML = '<span class="eyebrow">PRE-EVENT SOURCES</span><span>Displayed precision retained</span>';
+    title.textContent = 'Publication dates and precision';
     list.append(title);
     ledger.replaceChildren();
     for (const source of sources) {
@@ -170,7 +171,7 @@
       timing.textContent = `${source.publishedAt} · ${source.timestampPrecision}`;
       const eligibility = document.createElement('span');
       eligibility.className = 'source-state';
-      eligibility.textContent = source.eligibility || 'VERIFIED_PRE';
+      eligibility.textContent = source.eligibility === 'CATALOGUED' ? 'Listed' : source.eligibility === 'VERIFIED_PRE' ? 'Pre-cutoff checked' : source.eligibility || 'Pre-cutoff checked';
       row.append(anchor, publisher, timing, eligibility);
       list.append(row);
 
@@ -180,7 +181,7 @@
       const itemName = document.createElement('strong');
       itemName.textContent = source.publisher;
       const itemState = document.createElement('span');
-      itemState.textContent = source.eligibility || 'VERIFIED_PRE';
+      itemState.textContent = source.eligibility === 'CATALOGUED' ? 'Listed' : source.eligibility === 'VERIFIED_PRE' ? 'Checked' : source.eligibility || 'Checked';
       itemHead.append(itemName, itemState);
       const itemLink = document.createElement('a');
       itemLink.href = source.url;
@@ -188,13 +189,21 @@
       itemLink.rel = 'noopener noreferrer';
       itemLink.textContent = source.title;
       const itemTime = document.createElement('small');
-      itemTime.textContent = `${source.id} · ${source.publishedAt} · ${source.timestampPrecision}`;
+      const dateOnly = new Date(`${String(source.publishedAt).slice(0, 10)}T00:00:00Z`);
+      itemTime.textContent = Number.isNaN(dateOnly.getTime()) ? source.publishedAt : `Published ${dateOnly.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}`;
       const itemSummary = document.createElement('p');
       itemSummary.textContent = source.summary;
-      item.append(itemHead, itemLink, itemTime, itemSummary);
+      const disclosure = document.createElement('details');
+      disclosure.className = 'source-summary';
+      const summary = document.createElement('summary');
+      summary.textContent = 'Source details';
+      const sourceMetadata = document.createElement('p');
+      sourceMetadata.textContent = `${source.id} · ${source.publishedAt} · ${source.timestampPrecision}`;
+      disclosure.append(summary, itemSummary, sourceMetadata);
+      item.append(itemHead, itemLink, itemTime, disclosure);
       ledger.append(item);
     }
-    text('#source-count', `${sources.filter(source => source.id !== 'BITGET_PRE_CANDLE').length} DOCUMENTS`);
+    text('#source-count', `${sources.filter(source => source.id !== 'BITGET_PRE_CANDLE').length} documents`);
   }
 
   function renderCaseStatus() {
@@ -213,8 +222,8 @@
     }
     $('#enter-investigation').disabled = false;
     if (!state.readiness) {
-      text('#case-screen-status', 'Your evidence window is set.');
-      text('#case-screen-detail', 'Open the chamber to inspect sources. No run starts on entry.');
+      text('#case-screen-status', 'Evidence window selected');
+      text('#case-screen-detail', 'Browse the dated sources before starting research.');
     }
     if (state.readiness?.sources) renderSources(state.readiness.sources);
   }
@@ -228,7 +237,7 @@
     if (activeRole === 'ATLAS') current = 1;
     if (activeRole === 'VEX') current = 2;
     if (activeRole === 'SEAL') current = 3;
-    $('.workspace-steps > div').forEach((node, index) => {
+    $$('.workspace-steps > div').forEach((node, index) => {
       node.classList.toggle('current', index === current);
       node.classList.toggle('complete', index < current);
       if (index === current) node.setAttribute('aria-current', 'step');
@@ -273,7 +282,7 @@
     section.dataset.transcriptRole = 'atlas';
     const heading = document.createElement('div');
     heading.className = 'turn-head';
-    heading.innerHTML = '<strong class="atlas-ink">ATLAS / EVIDENCE ANALYST</strong><span>SERVER-VALIDATED JSON</span>';
+    heading.innerHTML = '<span>Citations checked</span>';
     const thesis = document.createElement('p');
     thesis.className = 'turn-thesis';
     thesis.textContent = output.thesis;
@@ -321,7 +330,7 @@
     section.dataset.transcriptRole = 'vex';
     const heading = document.createElement('div');
     heading.className = 'turn-head';
-    heading.innerHTML = '<strong class="vex-ink">VEX / COUNTERCASE</strong><span>CLAIM-BOUND CHALLENGE</span>';
+    heading.innerHTML = '<span>Challenges linked to claims</span>';
     section.append(heading);
     const challenges = output.challenges.map(challenge => ({ title: `${challenge.targetClaimId} · ${challenge.severity} · ${challenge.critique}`, citations: challenge.citations }));
     appendStringList(section, challenges.length ? 'Challenges' : 'No sourced challenge survived validation', challenges, sources);
@@ -341,7 +350,7 @@
     section.dataset.transcriptRole = 'seal';
     const heading = document.createElement('div');
     heading.className = 'turn-head';
-    heading.innerHTML = '<strong class="seal-ink">SEAL / AUDITOR</strong><span>DRAFT REVIEW · SERVER CHECK FOLLOWS</span>';
+    heading.innerHTML = '<span>Evidence audit</span>';
     const finding = document.createElement('p');
     finding.className = 'turn-thesis';
     finding.textContent = output.executiveFinding;
@@ -467,11 +476,13 @@
       setRole('seal', 'COMPLETE', false);
       renderSealDraft(state.sealToken.payload.record.stages.seal.payload.output, [...state.preToken.payload.prePack.sources, state.preToken.payload.prePack.bitgetSource]);
       $('#seal-panel').hidden = false;
+      $('#stage-actions').hidden = true;
       text('#seal-digest', result.digest);
       text('#seal-time', `${formatTime(result.sealedAt)} · Server signed`);
       text('#reveal-state', 'Receipt is sealed. Verify it or reveal the post-event window.');
       $('#reveal-outcome').disabled = false;
       renderWorkflow();
+      renderNavigation();
       saveSession();
       announce('The three roles completed and the pre-event record was sealed.');
     } catch {
@@ -487,7 +498,7 @@
       $('#run-controls').hidden = Boolean(state.atlasToken);
       $('#transcript-empty').hidden = Boolean(state.atlasToken);
       if (state.atlasToken && $('#transcript-content').children.length === 0) renderAtlas(state.atlasToken.payload.output, [...state.preToken.payload.prePack.sources, state.preToken.payload.prePack.bitgetSource]);
-      if (state.vexToken && ![...$('#transcript-content').children].some(node => node.textContent.includes('VEX / COUNTERCASE'))) renderVex(state.vexToken.payload.output, [...state.preToken.payload.prePack.sources, state.preToken.payload.prePack.bitgetSource]);
+      if (state.vexToken && ![...$('#transcript-content').children].some(node => node.dataset.transcriptRole === 'vex')) renderVex(state.vexToken.payload.output, [...state.preToken.payload.prePack.sources, state.preToken.payload.prePack.bitgetSource]);
       if (state.sealToken) {
         $('#stage-actions').hidden = true;
         $('#seal-panel').hidden = false;
@@ -495,7 +506,7 @@
         text('#seal-time', `${formatTime(state.sealToken.payload.sealedAt)} · Server signed`);
         text('#reveal-state', 'Receipt is sealed. Verify it or reveal the post-event window.');
         $('#reveal-outcome').disabled = false;
-        if (![...$('#transcript-content').children].some(node => node.textContent.includes('SEAL / AUDITOR'))) renderSealDraft(state.sealToken.payload.record.stages.seal.payload.output, [...state.preToken.payload.prePack.sources, state.preToken.payload.prePack.bitgetSource]);
+        if (![...$('#transcript-content').children].some(node => node.dataset.transcriptRole === 'seal')) renderSealDraft(state.sealToken.payload.record.stages.seal.payload.output, [...state.preToken.payload.prePack.sources, state.preToken.payload.prePack.bitgetSource]);
       }
     } else {
       $('#run-controls').hidden = false;
@@ -586,8 +597,8 @@
     text('#reveal-symbol', result.pre.symbol);
     text('#price-before', `${formatPrice(result.pre.close)} ${result.pre.quoteCoin}`);
     text('#price-after', `${formatPrice(result.post.close)} ${result.post.quoteCoin}`);
-    text('#time-before', `${result.pre.startAt}–${result.pre.endAt} UTC`);
-    text('#time-after', `${result.post.startAt}–${result.post.endAt} UTC`);
+    text('#time-before', formatWindow(result.pre.startAt, result.pre.endAt));
+    text('#time-after', formatWindow(result.post.startAt, result.post.endAt));
     text('#price-change', result.observedChangePercent == null ? 'UNAVAILABLE' : `${result.observedChangePercent < 0 ? '−' : result.observedChangePercent > 0 ? '+' : ''}${Math.abs(result.observedChangePercent).toFixed(4)}%`);
     $('#price-change').classList.toggle('positive-move', result.observedChangePercent > 0);
     text('#volume-before', `PRE TURNOVER · ${formatPrice(result.pre.quoteTurnover)} ${result.pre.quoteCoin}`);
@@ -610,6 +621,15 @@
     }
   }
 
+  function formatWindow(startAt, endAt) {
+    const start = new Date(startAt), end = new Date(endAt);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 'Timestamp unavailable';
+    const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+    const time = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'UTC' });
+    if (day.format(start) === day.format(end)) return `${day.format(start)} · ${time.format(start)}–${time.format(end)} UTC`;
+    return `${day.format(start)} ${time.format(start)} – ${day.format(end)} ${time.format(end)} UTC`;
+  }
+
   function formatPrice(value) {
     const number = Number(value);
     return Number.isFinite(number) ? number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : '—';
@@ -617,10 +637,27 @@
 
   async function renderProofState() {
     const hasReceipt = Boolean(state.sealToken);
+    $('.proof-receipt').hidden = !hasReceipt;
     $('#proof-download').disabled = !hasReceipt;
     $('#proof-verify').disabled = !hasReceipt;
     text('#proof-session-status', hasReceipt ? `Receipt available · ${state.sealToken.payload.digest}` : 'No sealed record in this session.');
 
+  }
+
+  function renderNavigation() {
+    const view = currentView();
+    const inApp = ['case', 'investigation', 'reveal'].includes(view);
+    $('.site-header').classList.toggle('is-app', inApp);
+    $('.app-nav').hidden = !inApp;
+    $('.site-nav').hidden = inApp;
+    $('.header-cta').hidden = inApp;
+    $('.menu-toggle').hidden = inApp;
+    $('[data-record]').hidden = !state.sealToken;
+    $('[data-reveal-nav]').hidden = !state.sealToken;
+    $$('.app-nav [data-route]').forEach(link => {
+      if (link.pathname === location.pathname) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
   }
 
   function closeMenu() {
@@ -638,6 +675,21 @@
 
   function bindEvents() {
     document.addEventListener('click', event => {
+      const record = event.target.closest('[data-record]');
+      if (record) {
+        event.preventDefault();
+        navigate(CASE_PATH);
+        $('#seal-panel').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        return;
+      }
+      const method = event.target.closest('[data-method]');
+      if (method) {
+        event.preventDefault();
+        if (currentView() !== 'proof') navigate('/proof');
+        history.replaceState({}, '', `/proof#${method.dataset.method}`);
+        document.getElementById(method.dataset.method).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        return;
+      }
       const how = event.target.closest('[data-how]');
       if (how) {
         event.preventDefault();

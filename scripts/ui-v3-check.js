@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const html = fs.readFileSync('public/index.html', 'utf8');
 const js = fs.readFileSync('public/app.js', 'utf8');
 const css = fs.readFileSync('public/styles.css', 'utf8');
+const ui = fs.readFileSync('public/ui.js', 'utf8');
 const vercel = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
 
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
@@ -30,8 +31,17 @@ assert(html.includes('not a newly verified') || html.includes('not a newly verif
 assert(html.includes('209.63') && html.includes('207.262'), 'Sample must cite documented observations');
 assert(html.includes('−1.1296%'), 'Sample must use the documented change');
 assert(!html.includes('THREE MINDS.') && !html.includes('STAGE PREVIEW / 01'), 'Broadcast marketing remnants found');
-assert(css.includes('color-scheme:light') && css.includes('--canvas:#f4f7f9'), 'Light design tokens missing');
+assert(css.includes('color-scheme:light') && css.includes('--canvas:#fff'), 'Light design tokens missing');
 assert(html.includes('/assets/agents/atlas-small.webp'), 'Original portrait thumbnails missing');
+
+assert(html.includes('Research.<br>Challenged.'), 'New reference-based hero missing');
+for (const role of ['atlas', 'vex', 'seal']) {
+  assert(html.includes('/assets/agents/' + role + '.webp'), 'Hero portrait missing: ' + role);
+}
+assert(!html.slice(html.indexOf('class="hero page-width"'), html.indexOf('class="compare-section')).includes('eyebrow'), 'Hero must not contain an eyebrow');
+assert(js.includes("$$('.workspace-steps > div')"), 'Workflow must iterate all stage elements');
+assert(!/fetch\s*\(/.test(ui), 'Motion enhancement must not make network requests');
+assert(ui.includes('prefers-reduced-motion'), 'Motion must respect reduced motion');
 
 const styles = css.replace(/\/\*[\s\S]*?\*\//g, '');
 let depth = 0;
@@ -42,4 +52,4 @@ for (const char of styles) {
 }
 assert.equal(depth, 0, 'Unclosed CSS brace');
 
-console.log('UI v3 offline structure check passed: routes, elements, recorded-data disclosures and CSS blocks.');
+console.log('UI offline structure check passed: routes, elements, recorded-data disclosures and CSS blocks.');
