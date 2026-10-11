@@ -5,14 +5,18 @@ const { canonicalize, sha256, signToken, verifyToken } = require('../lib/securit
 const { CASE_ID, CUTOFF_AT, PRE_WINDOW, PRE_SOURCES, getPreSources, isSourcePreEligible } = require('../lib/data/pre-case');
 const { assertPrePack, getSourceIds, assertAtlas, assertVex, assertSealDraft, assertVerifiedMarketInstruments } = require('../lib/case-validation');
 const { verifyReceipt } = require('../lib/receipt');
-const { selectNvdaRealityInstrument } = require('../lib/bitget');
+const { selectNvdaRealityInstrument, selectRealityInstrument } = require('../lib/bitget');
+const { roleOutputSchemas } = require('../lib/role-output-schemas');
+const tesla = require('../lib/data/tesla-pre-case');
+const { DEFAULT_CASE_ID, getPreSources: getCaseSources, isSupportedCase, listPreCases } = require('../lib/data/pre-cases');
 
 function pack() {
   return {
     caseId: CASE_ID,
     cutoffAt: CUTOFF_AT,
+    ticker: 'NVDA',
     sources: getPreSources(),
-    bitgetSource: { id: 'BITGET_PRE_CANDLE', url: 'https://www.bitget.com/docs/catalog/market/market-data' },
+    bitgetSource: { id: 'BITGET_PRE_CANDLE', title: 'NVDA Reality stock token · completed pre-cutoff candle', url: 'https://www.bitget.com/docs/catalog/market/market-data' },
     bitgetPre: {
       symbol: 'RNVDAUSDT', category: 'SPOT', isRwa: 'YES', isReality: 'yes', symbolType: 'stock', status: 'online', baseCoin: 'rNVDA', quoteCoin: 'USDT',
       interval: '15m', startAt: PRE_WINDOW.startAt, endAt: PRE_WINDOW.endAt,
@@ -50,6 +54,41 @@ test('date-only and timezone-unspecified sources preserve conservative pre-cutof
   assert.equal(isSourcePreEligible(afterCutoff), false);
 });
 
+test('NVIDIA remains the default supported case with its original four-source packet', () => {
+  const nvdaPack = pack();
+  assert.equal(DEFAULT_CASE_ID, CASE_ID);
+  assert.equal(nvdaPack.ticker, 'NVDA');
+  assert.deepEqual(getCaseSources(CASE_ID).map(source => source.id), PRE_SOURCES.map(source => source.id));
+  assert.equal(nvdaPack.sources.length, 4);
+  assert.equal(nvdaPack.sources.every(source => source.eligibility === 'VERIFIED_PRE'), true);
+  assert.equal(assertPrePack(nvdaPack), true);
+  assert.equal(listPreCases().some(item => item.caseId === CASE_ID && item.ticker === 'NVDA' && item.sourceCount === 4), true);
+});
+
+test('Tesla case has five pre-cutoff sources and an exact supported Reality stock packet', () => {
+  const tslaPack = {
+    caseId: tesla.CASE_ID,
+    cutoffAt: tesla.CUTOFF_AT,
+    ticker: tesla.TICKER,
+    sources: getCaseSources(tesla.CASE_ID),
+    bitgetSource: { id: 'BITGET_PRE_CANDLE', title: 'TSLA Reality stock token · completed pre-cutoff candle', url: 'https://www.bitget.com/docs/catalog/market/market-data' },
+    bitgetPre: {
+      symbol: 'RTSLAUSDT', category: 'SPOT', isRwa: null, isReality: 'yes', symbolType: 'stock', status: 'online', baseCoin: 'rTSLA', quoteCoin: 'USDT',
+      interval: '15m', startAt: tesla.PRE_WINDOW.startAt, endAt: tesla.PRE_WINDOW.endAt,
+      open: 374.77, high: 375.21, low: 374.13, close: 374.55, baseVolume: 754423.957363, quoteTurnover: 282692162.5657789
+    }
+  };
+  assert.equal(tslaPack.sources.length, 5);
+  assert.equal(tslaPack.sources.every(source => source.eligibility === 'VERIFIED_PRE'), true);
+  assert.equal(assertPrePack(tslaPack), true);
+  assert.equal(isSupportedCase(CASE_ID), true);
+  assert.equal(isSupportedCase(tesla.CASE_ID), true);
+  assert.equal(isSupportedCase('unknown-case'), false);
+  const changed = structuredClone(tslaPack);
+  changed.sources[0].publishedAt = '2026-07-23';
+  assert.throws(() => assertPrePack(changed), /PRE_SOURCE_NOT_ELIGIBLE|PRE_SOURCE_METADATA_CHANGED/);
+});
+
 test('pre packet rejects any price candle that crosses the evidence cutoff', () => {
   const valid = pack();
   assert.equal(assertPrePack(valid), true);
@@ -61,6 +100,8 @@ test('pre packet rejects any price candle that crosses the evidence cutoff', () 
 test('Bitget Reality stock discovery accepts omitted isRwa but rejects a negative flag', () => {
   const instrument = { symbol: 'RNVDAUSDT', baseCoin: 'rNVDA', quoteCoin: 'USDT', category: 'SPOT', symbolType: 'stock', status: 'online', isReality: 'yes' };
   assert.equal(selectNvdaRealityInstrument([instrument]), instrument);
+  const teslaInstrument = { symbol: 'RTSLAUSDT', baseCoin: 'rTSLA', quoteCoin: 'USDT', category: 'SPOT', symbolType: 'stock', status: 'online', isReality: 'yes' };
+  assert.equal(selectRealityInstrument([teslaInstrument], 'TSLA'), teslaInstrument);
   assert.throws(() => selectNvdaRealityInstrument([{ ...instrument, isRwa: 'no' }]), /BITGET_INSTRUMENT_NOT_FOUND/);
   assert.throws(() => selectNvdaRealityInstrument([instrument, { ...instrument, symbol: 'ANOTHERNVDAUSDT' }]), /BITGET_AMBIGUOUS_INSTRUMENT/);
   const missingFlag = pack();
@@ -91,6 +132,27 @@ test('ATLAS, VEX and SEAL outputs are role-shaped and citation-bound', () => {
   assert.equal(assertVex(vexOutput, ids, claimIds), undefined);
   const sealOutput = { dispositions: ['C1', 'C2', 'C3'].map(claimId => ({ claimId, status: 'UNRESOLVED', rationale: 'The historical price response is outside this evidence packet.', citations: [{ sourceId: 'NVDA_PRE_CALENDAR' }] })), executiveFinding: 'No directional result follows from the eligible evidence.', missedRisk: 'Historical model leakage remains possible.', forwardChecklist: ['Compare only after sealing.'] };
   assert.equal(assertSealDraft(sealOutput, ids, claimIds), undefined);
+});
+
+test('VEX and SEAL schema bounds leave room for complete audit reasoning', () => {
+  assert.equal(roleOutputSchemas.VEX.properties.challenges.items.properties.critique.maxLength, 800);
+  assert.equal(roleOutputSchemas.SEAL.properties.dispositions.items.properties.rationale.maxLength, 800);
+  const ids = getSourceIds(pack());
+  const atlasClaimIds = new Set(['C1', 'C2', 'C3']);
+  const longReason = 'A complete source-grounded sentence. '.repeat(18).trim();
+  assert.equal(longReason.length, 665);
+  const vexOutput = {
+    challenges: [{ targetClaimId: 'C1', critique: longReason, citations: [{ sourceId: 'NVDA_PRE_SP_GLOBAL' }], severity: 'MATERIAL' }],
+    concededClaimIds: [], missingEvidence: [], alternateHypotheses: []
+  };
+  assert.equal(assertVex(vexOutput, ids, atlasClaimIds), undefined);
+  const sealOutput = {
+    dispositions: ['C1', 'C2', 'C3'].map(claimId => ({ claimId, status: 'CONTESTED', rationale: longReason, citations: [{ sourceId: 'NVDA_PRE_CALENDAR' }] })),
+    executiveFinding: 'The available evidence does not establish a directional result.',
+    missedRisk: 'Historical model leakage remains possible.',
+    forwardChecklist: []
+  };
+  assert.equal(assertSealDraft(sealOutput, ids, atlasClaimIds), undefined);
 });
 
 test('role signatures and a canonical seal reject changed bytes', () => {
