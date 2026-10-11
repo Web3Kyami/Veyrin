@@ -64,3 +64,33 @@
 .case-directory-foot,.recorded-study-tabs,.sample-secondary-study{flex-direction:column;align-items:flex-start;gap:14px}
 .sample-secondary-study{padding:19px}.sample-secondary-study .button{width:100%}
 }
+
+.sample-walkthrough{margin:36px 0;border:1px solid var(--line);border-radius:24px;padding:32px}
+.walkthrough-heading{max-width:780px;margin-bottom:30px}
+.walkthrough-heading h2{font-size:clamp(26px,3vw,38px);margin:12px 0}
+.walkthrough-heading p{line-height:1.7;color:var(--muted)}
+.walkthrough-step{display:grid;grid-template-columns:minmax(170px,1fr) minmax(0,2fr);gap:24px;border-top:1px solid var(--line);padding:26px 0}
+.walkthrough-step-label{display:flex;align-items:start;gap:12px}
+.walkthrough-step-label span{font-size:12px;color:var(--teal);padding:7px;border:1px solid var(--line);border-radius:50%}
+.walkthrough-step-label h3{font-size:18px;line-height:1.35}
+.walkthrough-step-body{min-width:0;font-size:14px;line-height:1.7}
+.walkthrough-step-body p{margin:0 0 14px}
+.walkthrough-facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.walkthrough-facts>div{padding:13px;border:1px solid var(--line);border-radius:10px}
+.walkthrough-facts dt,.walkthrough-sources span{font-size:12px;color:var(--muted)}
+.walkthrough-facts dd{font-size:13px;font-weight:600;margin:5px 0;overflow-wrap:anywhere}
+.walkthrough-sources{padding-left:24px;display:grid;gap:12px}
+.walkthrough-sources span{display:block}
+.walkthrough-step-body a,.walkthrough-conclusion a{color:var(--teal);text-decoration:underline}
+.walkthrough-claims>div{background:#f8faf9;border-left:3px solid var(--teal);margin:12px 0;padding:12px 15px}
+.walkthrough-claims p,.walkthrough-dispositions p{font-size:13px;margin:6px 0}
+.walkthrough-dispositions>div{padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin:9px 0}
+.walkthrough-dispositions strong{margin-right:12px}
+.walkthrough-dispositions span{font-weight:600;color:var(--teal);font-size:12px}
+.walkthrough-price-table{width:100%;border-collapse:collapse;margin:16px 0}
+.walkthrough-price-table th,.walkthrough-price-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+.walkthrough-price-table td:last-child{text-align:right}
+.walkthrough-conclusion{background:#f0f7f5;border-radius:16px;padding:26px}
+.walkthrough-conclusion h3{font-size:clamp(22px,2.5vw,29px);margin:12px 0}
+.walkthrough-conclusion p{font-size:14px;line-height:1.7;margin:10px 0}
+@media(max-width:760px){.sample-walkthrough{padding:18px;margin:24px 0}.walkthrough-step{grid-template-columns:1fr;gap:12px;padding:21px 0}.walkthrough-facts{grid-template-columns:1fr}}
