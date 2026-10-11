@@ -1,6 +1,6 @@
 # Tesla Q2 2026 earnings historical reconstruction
 
-**Status (2026-10-11):** the five-source pre-event packet and Bitget instrument are verified. A Preview run completed preflight, ATLAS, VEX, SEAL, and one valid receipt check with signed stage tokens. The test did not retain the digest before the next UI assertion failed, and no market reveal was completed. Later verify and reveal requests received Vercel Security Checkpoint responses. This is a retrospective reconstruction, not a contemporaneous forecast. A pretrained model may have learned the outcome.
+**Status (2026-10-11):** a fresh investigation on the final protected Preview completed preflight, ATLAS, VEX, SEAL, receipt verification, and outcome reveal with Qwen through OpenRouter. All six API responses returned HTTP 200; every stage response included its required signed token, tokens persisted in browser session storage, and the browser rendered the thesis, claims, challenges, audit, receipt, citations, and results. The desktop and 390px mobile UI checks passed with no browser errors or horizontal overflow. VEX generated unsupported alternative hypotheses about channel stuffing and synthetic or decoupled token mechanics. VEX and SEAL also mischaracterized Tesla's company-compiled consensus of sell-side analysts as not sell-side, despite the linked source listing analyst inputs. These model statements are not evidence-backed findings; the server validates citation IDs, not semantic entailment. This is a retrospective reconstruction, not a contemporaneous forecast. A pretrained model may have learned the outcome.
 
 ## Cutoff and windows
 
@@ -34,4 +34,13 @@ These sources precede the cutoff. Their current accessibility and displayed cont
 
 ## Outcome compartment
 
-Only after the record is sealed and verified, the reveal route loads the post window and links [Tesla's Q2 2026 financial results](https://ir.tesla.com/press-release/tesla-releases-second-quarter-2026-financial-results), published July 22 with date-only precision. The more precise 4:14 p.m. EDT time is from the Business Wire syndication noted above. Outcome candles, observed prices, volume, and change belong to the reveal record, never this case's model prompt.
+Only after the record is sealed and verified, the reveal route loads the post window and links [Tesla's Q2 2026 financial results](https://ir.tesla.com/press-release/tesla-releases-second-quarter-2026-financial-results), published July 22 with date-only precision. The more precise 4:14 p.m. EDT time is from the Business Wire syndication noted above.
+
+The final Preview run produced receipt digest `4a218ae5705ba3821ee73e2aa5e58d2786b7e204a1f649c57bbcdc28c01ea27d`; verification returned `valid: true` with the message “Receipt bytes and server signature verified.” Bitget returned these completed SPOT candles for `RTSLAUSDT`:
+
+| Window (UTC) | Open | High | Low | Close | Quote turnover |
+|---|---:|---:|---:|---:|---:|
+| July 22, 19:30-19:45 | 374.77 | 375.21 | 374.13 | 374.55 USDT | 282,692,162.5658 USDT |
+| July 22, 20:30-20:45 | 365.53 | 366.001 | 363.95 | 364.70 USDT | 139,986,137.6765 USDT |
+
+The displayed close-to-close change is -2.6298%. Outcome candles, observed prices, volume, and change belong to the reveal record, never this case's model prompt. The change is not a causal estimate, executable return, or proof that the thesis was correct.

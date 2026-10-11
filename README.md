@@ -6,7 +6,7 @@ VEYRIN puts three AI research roles on the same evidence. One builds the investm
 
 VEYRIN supports two curated historical earnings investigations: NVIDIA fiscal Q2 FY2027 and Tesla Q2 2026. Tesla is the second case, with its own dated evidence packet, cutoff, Bitget Reality SPOT instrument, and market windows. Both are retrospective reconstructions, not contemporaneous forecasts.
 
-**[Live Preview](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/) | [Open the research chamber](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/chamber) | [See the completed study](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/sample) | [Read the verification method](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/proof)**
+**[Live Preview](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/) | [Open the research chamber](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/chamber) | [See the completed study](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/sample) | [Read the verification method](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/proof)**
 
 > The linked URL is a team-protected Vercel Preview for the current `design/agent-led-v4` code. This branch has not been merged into `main` or deployed to Production.
 
@@ -26,11 +26,11 @@ You can inspect the entire case without starting an AI run.
 
 | Where to go | What you can do |
 | --- | --- |
-| **[Chamber](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/chamber)** | Choose the NVIDIA or Tesla event and browse its dated source catalogue |
-| **[Research](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/chamber/nvda-2026-q2-fy27)** | Read dated sources, add an optional question, and choose whether to run the agents |
-| **[Tesla research](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/chamber/tsla-2026-q2)** | Inspect Tesla Q2 2026 sources, cutoff, and Bitget `RTSLAUSDT` market window |
-| **[Recorded study](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/sample)** | See the findings and selected market observations from a previously completed investigation |
-| **[Evidence & method](https://veyrin-research-chamber-i3v5uzrmd-web3kyamis-projects.vercel.app/proof)** | See the source cutoff, verification process, and what a receipt actually establishes |
+| **[Chamber](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/chamber)** | Choose the NVIDIA or Tesla event and browse its dated source catalogue |
+| **[Research](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/chamber/nvda-2026-q2-fy27)** | Read dated sources, add an optional question, and choose whether to run the agents |
+| **[Tesla research](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/chamber/tsla-2026-q2)** | Inspect Tesla Q2 2026 sources, cutoff, and Bitget `RTSLAUSDT` market window |
+| **[Recorded study](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/sample)** | See the findings and selected market observations from a previously completed investigation |
+| **[Evidence & method](https://veyrin-research-chamber-o4eke2ml0-web3kyamis-projects.vercel.app/proof)** | See the source cutoff, verification process, and what a receipt actually establishes |
 
 **If you're judging the project:** start with the recorded study. It contains the results of a real earlier end-to-end run and requires no model credits. Then open the Chamber, expand the dated sources, and look at the agent workflow. A fresh run is optional and will use the configured model provider.
 
@@ -124,7 +124,21 @@ The four source documents retain their original timestamp precision. The SEC acc
 
 Tesla's official schedule published before the event said results would follow after market close on 22 July, without an exact release time. A Business Wire copy timestamps the results notice at 4:14 p.m. EDT, 29 minutes after the 19:45 UTC cutoff; the selected post-event candle opens at 20:30 UTC, 16 minutes after that notice. The selected cutoff is the completed pre-event candle boundary, not a claim about the exact publication second. Source timing and the cutoff policy are documented in [Tesla provenance](data/cases/tsla-2026-q2/EVIDENCE.md). This remains a historical reconstruction; model training leakage is possible.
 
-### What the completed investigation showed
+### Tesla Preview run (October 11, 2026)
+
+The final protected Preview completed preflight, ATLAS, VEX, SEAL, receipt verification, and the Bitget reveal with Qwen through OpenRouter. All six API responses returned HTTP 200; preflight and all three roles returned signed tokens, the browser retained them, and receipt verification returned `valid: true`. The UI rendered the research, citations, all agent states, receipt, and market outcome. Desktop and 390px mobile checks passed without browser errors or horizontal overflow.
+
+| Stage | Actual finding |
+| --- | --- |
+| **ATLAS** | Mixed thesis. C1 compared 480,126 Q2 deliveries with the 406,024 company-compiled estimate. C2 used the $374.55 pre-event candle to discuss valuation. C3 compared the $27.584B revenue estimate and $0.36 GAAP EPS estimate with Q1 revenue. |
+| **VEX** | Challenged whether company-compiled estimates establish market-wide expectations, whether one candle supports a valuation inference, and whether Q2 estimates establish growth expectations. |
+| **SEAL** | C1 contested, C2 unresolved, C3 contested. It found the packet insufficient to establish a confident financial or market-sentiment assessment. |
+| **Receipt** | Verified `valid: true`; SHA-256 digest `4a218ae5705ba3821ee73e2aa5e58d2786b7e204a1f649c57bbcdc28c01ea27d`. |
+| **Bitget** | `RTSLAUSDT` closed at 374.55 USDT for 19:30-19:45 UTC and 364.70 USDT for 20:30-20:45 UTC, an observed change of **-2.6298%**. |
+
+VEX also generated speculative alternatives about channel stuffing and synthetic or decoupled token mechanics. The packet does not establish those scenarios. Bitget describes Reality stock tokens as 1:1 backed in its [stock spot overview](https://www.bitget.com/support/articles/12560603887209), so the synthetic-token alternative is unsupported and should not be read as a finding. VEX and SEAL also mischaracterized Tesla's company-compiled consensus of sell-side analysts as not sell-side, despite the linked sources listing analyst inputs. The server validates citation IDs, not whether every cited passage entails the model's wording. Treat these as model-quality errors requiring human review. The full result and source timing are recorded in [Tesla provenance](data/cases/tsla-2026-q2/EVIDENCE.md). The observed movement is not a causal estimate or proof that the thesis was correct.
+
+### NVIDIA recorded result
 
 An earlier end-to-end run finished the agent sequence, server checks, receipt verification, and market reveal. The public recorded study presents its **saved summary**. It is not a new inference run and does not contain a replay of every original agent message.
 
@@ -161,7 +175,7 @@ The price change is measured between two selected completed Bitget candles. It i
 | Record integrity | Canonical JSON, SHA-256 digest, signed stage and final receipt tokens |
 | Session | Browser `sessionStorage` plus an exportable receipt |
 
-Qwen through OpenRouter returned validated ATLAS, VEX, and SEAL outputs with signed stage tokens, and one Preview receipt verification returned `valid: true`. The full browser-to-reveal run remains incomplete: Vercel Security Checkpoint responses blocked later verification and reveal attempts, so no Tesla market outcome, receipt digest, or completed-view screenshot is reported from this session. Provider selection is explicit, with no automatic silent fallback.
+On October 11, 2026, the protected Preview completed a fresh Tesla investigation with Qwen through OpenRouter. Preflight, ATLAS, VEX, SEAL, verification, and reveal all returned HTTP 200; signed stage tokens were captured, the receipt verified, and real Bitget observations rendered. The exact Preview model is `qwen/qwen3-30b-a3b-instruct-2507:nitro`. Provider selection is explicit, with no automatic silent fallback. One VEX alternate hypothesis about synthetic token mechanics was unsupported by the supplied evidence and is documented above.
 
 ### Why Bitget is involved
 
